@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Busview Interface</title>
+<style>
+body { margin:0 } [hidden] { display:none !important }
+/* The Busview interface design: the working window at its real size, its theme and its states. design/SPEC.md is the contract written from it. */
+:root { --pg:#EEEDE9; --pfg:#191B20; --pdim:#5D626C; --pline:#D3D1CA; --pcard:#F8F7F4; --pacc:#0A7F6B;
+  --ui:"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif; --disp:"Segoe UI Variable Display","Segoe UI",system-ui,sans-serif; --mono:"Cascadia Mono",Consolas,ui-monospace,monospace }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --pg:#0F1114; --pfg:#ECEBE7; --pdim:#9CA1AB; --pline:#2B2F37; --pcard:#171A1F; --pacc:#3DDC97; color-scheme:dark } }
+:root[data-theme="dark"] { --pg:#0F1114; --pfg:#ECEBE7; --pdim:#9CA1AB; --pline:#2B2F37; --pcard:#171A1F; --pacc:#3DDC97; color-scheme:dark }
+body { background:var(--pg); color:var(--pfg); font-family:var(--ui); font-size:15px; line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); padding-block:32px 72px }
+.page { max-width:1240px; margin:0 auto; display:flex; flex-direction:column; gap:20px }
+.page h1 { font-family:var(--disp); font-size:clamp(26px,4vw,38px); letter-spacing:-0.02em; line-height:1.1; margin:0; text-wrap:balance }
+.page .lede { color:var(--pdim); max-width:78ch; margin:0 } .page code { font-family:var(--mono); font-size:13px }
+html.capture body { padding:0; background:transparent } html.capture .page > :not(.stage) { display:none } html.capture .stage { padding:0; overflow:visible } html.capture .app { margin:0; border-radius:0; box-shadow:none }
+.bar { display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center }
+.seg { display:inline-flex; border:1px solid var(--pline); border-radius:10px; padding:3px; background:var(--pcard); flex-wrap:wrap }
+.seg button { font:inherit; font-weight:600; border:0; background:none; color:var(--pdim); padding:7px 14px; border-radius:7px; cursor:pointer }
+.seg button[aria-pressed="true"] { background:var(--pfg); color:var(--pg) }
+.seg button:focus-visible, .states button:focus-visible { outline:2px solid var(--pacc); outline-offset:1px }
+.barlabel { font-size:12px; letter-spacing:0.08em; text-transform:uppercase; font-weight:600; color:var(--pdim) }
+.stage { overflow-x:auto; padding:4px 2px 14px }
+.states { display:flex; flex-wrap:wrap; gap:8px; align-items:center }
+.states button { font:inherit; font-size:13px; border:1px solid var(--pline); background:var(--pcard); color:var(--pfg); padding:6px 12px; border-radius:999px; cursor:pointer }
+.states button[aria-pressed="true"] { border-color:var(--pacc); color:var(--pacc); font-weight:600 }
+
+/* ---------- the application window: resolute-ui tokens (Resolute-SDK DESIGN.md sections 3 to 5), Busview's accent ---------- */
+.app { --background:#F6F5F2; --surface:#ECEAE5; --surfaceHover:#E3E0DA; --surfaceActive:#D9D6CF; --toolbar:#FCFBF9; --text:#17191E; --textSecondary:#56524A;
+  --border:#827E76; --hair:#D8D5CE; --accent:#8A5A00; --accentHover:#734B00; --accentSubtle:#F6E7C6; --onAccent:#FFFFFF; --statusBar:#E8E6E0; --statusBarText:#56524A;
+  --success:#1B7A4B; --warning:#8A5A00; --error:#B3261E; --info:#1D5FBF; --successSubtle:#DDF1E5; --warningSubtle:#F6E7C6; --errorSubtle:#F9DEDB; --infoSubtle:#DCE8FA;
+  --surfaceHigh:#FFFFFF; --scrim:rgba(23,25,30,0.45); --shadow:0 18px 50px rgba(23,25,30,0.22);
+  width:1180px; height:748px; background:var(--background); color:var(--text); font-family:var(--ui); font-size:13px; line-height:1.4; border-radius:8px;
+  border:1px solid var(--hair); box-shadow:var(--shadow); display:grid; grid-template-rows:36px minmax(0,1fr) 26px; overflow:hidden; position:relative; margin:0 auto }
+.app[data-mock="dark"] { --background:#17191E; --surface:#1F2228; --surfaceHover:#272B32; --surfaceActive:#30343C; --toolbar:#23262D; --text:#ECEAE5; --textSecondary:#B0B3BA;
+  --border:#80858F; --hair:#33373F; --accent:#FFB020; --accentHover:#FFC14D; --accentSubtle:#3A3018; --onAccent:#17191E; --statusBar:#1B1D22; --statusBarText:#B0B3BA;
+  --success:#4ADE80; --warning:#FFB020; --error:#FF7A6E; --info:#7FB2FF; --successSubtle:#143122; --warningSubtle:#3A3018; --errorSubtle:#3D1E1B; --infoSubtle:#1A2A45;
+  --surfaceHigh:#2A2E36; --scrim:rgba(0,0,0,0.55); --shadow:0 18px 50px rgba(0,0,0,0.5) }
+.app * { box-sizing:border-box }
+.app svg.lucide { width:16px; height:16px; stroke-width:1.75; flex:none }
+.caption { display:flex; align-items:center; gap:8px; padding:0 0 0 12px; background:var(--toolbar); border-bottom:1px solid var(--hair); font-size:12px }
+.caption .mark { width:18px; height:18px } .caption .ttl { flex:1; color:var(--textSecondary) } .caption .ttl b { color:var(--text); font-weight:600 }
+.caption .wc { display:flex; height:100% } .caption .wc span { width:46px; display:grid; place-items:center; color:var(--textSecondary) } .caption .wc svg.lucide { width:14px; height:14px }
+.body { display:grid; grid-template-columns:212px minmax(0,1fr); min-height:0 }
+.side { background:var(--surface); border-right:1px solid var(--hair); padding:8px; display:flex; flex-direction:column; gap:2px; overflow:auto }
+.side .nav { position:relative; display:flex; align-items:center; gap:10px; height:34px; padding:0 10px; border-radius:6px; border:0; background:none; color:var(--text); font:inherit; text-align:left; cursor:pointer; width:100% }
+.side .nav:hover { background:var(--surfaceHover) } .side .nav[aria-current="page"] { background:var(--surfaceActive); font-weight:600 }
+.side .nav[aria-current="page"]::before { content:""; position:absolute; left:0; top:8px; bottom:8px; width:3px; border-radius:2px; background:var(--accent) }
+.side .nav .count { margin-left:auto; font-size:11px; color:var(--textSecondary); font-weight:400 } .side .nav .dot { margin-left:auto; width:8px; height:8px; border-radius:50%; background:var(--warning) }
+.side .sep { height:1px; background:var(--hair); margin:6px 4px } .side .grow { flex:1 }
+.side .cap { font-size:11px; color:var(--textSecondary); padding:8px 10px 2px; letter-spacing:0.04em; text-transform:uppercase }
+.app button:focus-visible, .app [tabindex]:focus-visible, .app input:focus-visible { outline:2px solid var(--accent); outline-offset:1px }
+.main { display:grid; grid-template-rows:auto minmax(0,1fr); min-width:0; min-height:0 }
+.head { display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid var(--hair); background:var(--background); min-height:57px }
+.head h2 { font-family:var(--disp); font-size:20px; font-weight:600; margin:0; flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
+.head .sub { font-size:13px; font-weight:400; color:var(--textSecondary); margin-left:8px }
+.btn { display:inline-flex; align-items:center; gap:6px; height:32px; padding:0 12px; border-radius:6px; border:1px solid var(--border); background:var(--toolbar); color:var(--text); font:inherit; cursor:pointer; white-space:nowrap }
+.btn:hover { background:var(--surfaceHover) } .btn.primary { background:var(--accent); border-color:var(--accent); color:var(--onAccent); font-weight:600 } .btn.primary:hover { background:var(--accentHover) }
+.btn.danger { background:var(--error); border-color:var(--error); color:var(--onAccent); font-weight:600 } .btn.quiet { border-color:transparent; background:none; color:var(--accent); padding:0 6px } .btn.sm { height:26px; padding:0 8px; font-size:12px }
+.content { overflow:auto; padding:16px; display:flex; flex-direction:column; gap:16px; min-height:0 }
+.content.flush { padding:0; gap:0 }
+.status { display:flex; align-items:center; gap:16px; padding:0 12px; background:var(--statusBar); color:var(--statusBarText); border-top:1px solid var(--hair); font-size:12px }
+.status .r { margin-left:auto; display:flex; gap:16px }
+.grp { border:1px solid var(--hair); border-radius:8px; background:var(--toolbar); overflow:hidden }
+.grp > h3 { margin:0; padding:9px 12px; font-size:13px; font-weight:600; border-bottom:1px solid var(--hair); display:flex; align-items:center; gap:8px }
+.grp > h3 .note { margin-left:auto; font-weight:400; color:var(--textSecondary); font-size:12px }
+.kv { display:grid; grid-template-columns:220px minmax(0,1fr); padding:7px 12px; gap:12px; border-bottom:1px solid var(--hair) } .kv:last-child { border-bottom:0 }
+.kv .k { color:var(--textSecondary) } .kv .v { min-width:0; overflow-wrap:anywhere } .mono { font-family:var(--mono); font-size:12px }
+.kv .ex { grid-column:2; color:var(--textSecondary); font-size:12px; margin-top:-6px } .app:not([data-explain="on"]) .ex { display:none }
+.chip { display:inline-flex; align-items:center; gap:5px; height:22px; padding:0 8px; border-radius:11px; font-size:12px; font-weight:600; white-space:nowrap }
+.chip svg.lucide { width:13px; height:13px; stroke-width:2 }
+.chip.ok { background:var(--successSubtle); color:var(--success) } .chip.warn { background:var(--warningSubtle); color:var(--warning) } .chip.bad { background:var(--errorSubtle); color:var(--error) }
+.chip.info { background:var(--infoSubtle); color:var(--info) } .chip.plain { background:var(--surface); color:var(--textSecondary) }
+table.t { width:100%; border-collapse:collapse } .t th { text-align:left; font-weight:600; font-size:12px; color:var(--textSecondary); padding:7px 12px; border-bottom:1px solid var(--hair); position:sticky; top:0; background:var(--toolbar) }
+.t td { padding:7px 12px; border-bottom:1px solid var(--hair); vertical-align:middle } .t tr:last-child td { border-bottom:0 } .t tr.sel td { background:var(--accentSubtle) } .t tbody tr[tabindex] { cursor:pointer } .t tbody tr[tabindex]:hover td { background:var(--surfaceHover) } .t tr.sel:hover td { background:var(--accentSubtle) }
+.t td.num, .t th.num { text-align:right; font-variant-numeric:tabular-nums }
+.advice { display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:12px; align-items:start; padding:12px; border-radius:8px; background:var(--toolbar); border:1px solid var(--border) }
+.advice.warn { background:var(--warningSubtle); border-color:var(--warning) } .advice.warn > svg.lucide { color:var(--warning) }
+.advice > svg.lucide { color:var(--info); width:20px; height:20px; margin-top:1px } .advice h4 { margin:0 0 2px; font-size:13px; font-weight:600 } .advice p { margin:0; color:var(--text) } .advice .acts { display:flex; gap:8px }
+.spec { font-family:var(--mono); font-size:12px; background:var(--surfaceHigh); border:1px solid var(--hair); border-radius:6px; padding:6px 8px; display:inline-block; margin-top:6px; user-select:all }
+.slots { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px } .slot { border:1px solid var(--hair); border-radius:8px; padding:10px; background:var(--toolbar); display:flex; flex-direction:column; gap:4px; min-width:0 }
+.slot.free { border-style:dashed; border-color:var(--border); background:none } .slot .nm { font-family:var(--mono); font-size:12px; color:var(--textSecondary) } .slot .big { font-size:16px; font-weight:600 } .slot .sm { color:var(--textSecondary); font-size:12px }
+.tiles { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px } .tile { border:1px solid var(--hair); border-radius:8px; background:var(--toolbar); padding:10px 12px; min-width:0; text-align:left; font:inherit; color:inherit; cursor:pointer }
+.tile:hover { background:var(--surfaceHover) } .tile .lab { color:var(--textSecondary); font-size:12px; display:flex; align-items:center; gap:6px } .tile .val { font-size:16px; font-weight:600; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis } .tile .more { color:var(--textSecondary); font-size:12px }
+.tools { display:flex; gap:8px; align-items:center; flex-wrap:wrap } .field { display:flex; align-items:center; gap:6px; height:32px; padding:0 10px; border:1px solid var(--border); border-radius:6px; background:var(--toolbar); color:var(--textSecondary); min-width:220px }
+.field input { border:0; background:none; color:var(--text); font:inherit; flex:1; min-width:0; outline:none } .pills { display:flex; gap:4px; flex-wrap:wrap }
+.pill { height:28px; padding:0 10px; border-radius:14px; border:1px solid var(--hair); background:none; color:var(--text); font:inherit; cursor:pointer } .pill[aria-pressed="true"] { background:var(--accentSubtle); border-color:var(--accent); color:var(--accent); font-weight:600 }
+.tabs { display:flex; gap:2px; padding:0 16px; border-bottom:1px solid var(--hair); background:var(--background) } .tab { border:0; background:none; font:inherit; color:var(--textSecondary); padding:10px 10px 9px; border-bottom:2px solid transparent; cursor:pointer }
+.tab[aria-selected="true"] { color:var(--text); font-weight:600; border-bottom-color:var(--accent) }
+.split { display:grid; grid-template-columns:minmax(0,1fr) 340px; min-height:0; height:100% } .split > .l { overflow:auto; min-width:0 } .split > .r { border-left:1px solid var(--hair); background:var(--surface); overflow:auto; padding:16px; display:flex; flex-direction:column; gap:12px }
+.r h3 { margin:0; font-size:16px; font-weight:600 } .r p { margin:0 } .r .steps { margin:0; padding-left:18px; display:flex; flex-direction:column; gap:4px } .r .lbl { font-size:11px; letter-spacing:0.04em; text-transform:uppercase; color:var(--textSecondary) }
+.beep { font-family:var(--mono); letter-spacing:0.08em } .muted { color:var(--textSecondary) }
+.cards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px } .card { border:1px solid var(--hair); border-radius:10px; background:var(--toolbar); padding:14px; display:flex; flex-direction:column; gap:8px; min-width:0 }
+.card .top { display:flex; align-items:center; gap:8px } .card .q { color:var(--textSecondary); font-size:12px } .card h3 { margin:0; font-size:16px; font-weight:600 } .card p { margin:0 } .card .acts { display:flex; gap:8px; margin-top:auto; padding-top:4px; flex-wrap:wrap }
+.card .ico { width:32px; height:32px; border-radius:8px; background:var(--surface); display:grid; place-items:center; color:var(--textSecondary) } .card.wide { grid-column:1 / -1 }
+.hero { display:flex; align-items:center; gap:14px; padding:14px; border:1px solid var(--hair); border-radius:10px; background:var(--toolbar) } .hero .big { font-size:20px; font-weight:600; font-family:var(--disp) } .hero .grow { flex:1; min-width:0 }
+.diff td.was { color:var(--textSecondary); text-decoration:line-through } .empty { margin:auto; text-align:center; max-width:380px; display:flex; flex-direction:column; gap:10px; align-items:center; color:var(--textSecondary) } .empty svg.lucide { width:32px; height:32px } .empty h3 { margin:0; color:var(--text); font-size:16px }
+.refuse { display:flex; gap:12px; align-items:center; padding:12px; border:1px solid var(--hair); border-radius:8px; background:var(--surface) } .refuse .grow { flex:1 }
+.scan { position:absolute; inset:0; background:var(--background); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; z-index:2 }
+.prog { width:320px; height:6px; border-radius:3px; background:var(--surface); overflow:hidden } .prog i { display:block; width:58%; height:100%; background:var(--accent); border-radius:3px }
+.scrim { position:absolute; inset:0; background:var(--scrim); display:grid; place-items:center; z-index:5 } .dlg { width:440px; background:var(--surfaceHigh); border:1px solid var(--hair); border-radius:10px; box-shadow:var(--shadow); padding:20px; display:flex; flex-direction:column; gap:10px }
+.dlg h3 { margin:0; font-size:16px } .dlg p { margin:0 } .dlg .acts { display:flex; justify-content:flex-end; gap:8px; margin-top:8px }
+.setrow { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:16px; align-items:center; padding:10px 12px; border-bottom:1px solid var(--hair) } .setrow:last-child { border-bottom:0 } .setrow .d { color:var(--textSecondary); font-size:12px }
+.sg { display:inline-flex; border:1px solid var(--border); border-radius:6px; overflow:hidden } .sg button { border:0; background:var(--toolbar); color:var(--text); font:inherit; height:28px; padding:0 10px; cursor:pointer; border-right:1px solid var(--hair) } .sg button:last-child { border-right:0 } .sg button[aria-pressed="true"] { background:var(--accent); color:var(--onAccent); font-weight:600 }
+.sw { width:36px; height:20px; border-radius:10px; border:1px solid var(--border); background:var(--toolbar); position:relative; cursor:pointer; padding:0 } .sw::after { content:""; position:absolute; top:2px; left:2px; width:14px; height:14px; border-radius:50%; background:var(--border); transition:left .15s }
+.sw[aria-checked="true"] { background:var(--accent); border-color:var(--accent) } .sw[aria-checked="true"]::after { left:18px; background:var(--onAccent) }
+.about { display:flex; gap:18px; align-items:center } .about .mark { width:72px; height:72px }
+.map { display:grid; place-items:center; padding:16px; background:var(--background) } .map svg { max-width:100%; height:auto }
+.map .pcb { fill:var(--surface); stroke:var(--border) } .map .part { cursor:pointer } .map .part rect, .map .part circle { fill:var(--toolbar); stroke:var(--border); stroke-width:1.2 } .map .part.fit rect { fill:var(--successSubtle); stroke:var(--success) }
+.map .part.free rect { fill:none; stroke-dasharray:4 3 } .map .part.sel rect { stroke:var(--accent); stroke-width:3 } .map .part.warn rect { fill:var(--warningSubtle); stroke:var(--warning) } .map .part:hover rect { stroke-width:2.4 }
+.map text { font-family:var(--ui); font-size:11px; fill:var(--textSecondary); pointer-events:none } .map text.t1 { fill:var(--text); font-weight:600; font-size:12px } .map .fixed rect { fill:var(--surfaceActive); stroke:none }
+.legend { display:flex; gap:14px; font-size:12px; color:var(--textSecondary); padding:0 16px 12px; background:var(--background); align-items:center } .legend i { display:inline-block; width:14px; height:10px; border-radius:2px; margin-right:5px; vertical-align:-1px; border:1.2px solid var(--border) }
+.legend i.fit { background:var(--successSubtle); border-color:var(--success) } .legend i.free { border-style:dashed } .legend i.warn { background:var(--warningSubtle); border-color:var(--warning) }
+@media (prefers-reduced-motion: reduce) { .sw::after { transition:none } }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Busview interface</h1>
+  <p class="lede">The chosen design (owner, 2026-11-17): one section per part of the computer, with a Board view that draws the slots and connectors. It is a Resolute tool window, so the sidebar, content header, status bar, Activity, Settings and About are the suite's. The accent follows Windows; Amber, the suite's fallback, is shown. The machine shown is example data. <code>design/SPEC.md</code> is the contract for building it 1:1.</p>
+  <div class="bar">
+    <span class="barlabel">Window theme</span>
+    <div class="seg" id="themes" role="group" aria-label="Window theme">
+      <button type="button" id="theme-light" data-theme="light" aria-pressed="true">Light</button>
+      <button type="button" id="theme-dark" data-theme="dark" aria-pressed="false">Dark</button>
+    </div>
+  </div>
+  <div class="stage"><div class="app" id="app" data-mock="light"></div></div>
+  <div class="states" id="states" role="group" aria-label="States">
+    <span class="barlabel">States</span>
+    <button type="button" id="st-scan" data-st="scan" aria-pressed="false">First scan</button>
+    <button type="button" id="st-user" data-st="user" aria-pressed="false">Not running as administrator</button>
+    <button type="button" id="st-nosnap" data-st="nosnap" aria-pressed="false">No snapshots yet</button>
+    <button type="button" id="st-dialog" data-st="dialog" aria-pressed="false">Delete confirmation</button>
+    <button type="button" id="st-nomatch" data-st="nomatch" aria-pressed="false">Search with no match</button>
+  </div>
+</div>
+
+<script src="lucide.min.js"></script>
+<script>
+(function () {
+'use strict';
+var S = { sec: null, part: 'dimm-a2', beepMaker: 'AMI', beepSel: 2, q: '', snapA: 0, snapB: 2, comparing: false,
+          setPage: 'general', theme: 'system', density: 'normal', explain: false, st: {} };
+var app = document.getElementById('app');
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function ic(n) { return '<i data-lucide="' + n + '"></i>'; }
+function chip(kind, text) { var i = { ok: 'circle-check', warn: 'triangle-alert', bad: 'circle-x', info: 'info', plain: 'minus' }[kind]; return '<span class="chip ' + kind + '">' + ic(i) + esc(text) + '</span>'; }
+function btn(label, o) { o = o || {}; return '<button type="button" class="btn' + (o.cls ? ' ' + o.cls : '') + '"' + (o.act ? ' data-act="' + o.act + '"' : '') + '>' + (o.icon ? ic(o.icon) : '') + esc(label) + '</button>'; }
+var MARK = '<svg class="mark" viewBox="0 0 96 96" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M8 30H16M8 48H16M8 66H16" stroke="#5CF0B4" stroke-width="7"/><path d="M32 16H54A16 16 0 0 1 54 48H32" stroke="#3DDC97" stroke-width="11"/><path d="M32 48H60A16 16 0 0 1 60 80H32" stroke="#0E9F6E" stroke-width="11"/><path d="M32 16V80" stroke="#0E9F6E" stroke-width="11"/></g></svg>';
+
+/* ---------- the machine: one inventory, read by every direction ---------- */
+var AREAS = [
+ { id: 'memory', name: 'Memory', icon: 'memory-stick', groups: [
+   ['Summary', [['Fitted', '16 GB (2 x 8 GB)', 0, 'How much memory is in the computer now.'], ['Type', 'DDR4, UDIMM (desktop)', 0, 'The generation and shape a new module must match.'], ['Slots', '2 of 4 used', 0, 'Free slots mean you can add memory without removing any.'], ['Running speed', '3200 MT/s', 0, 'The speed the fitted modules run at now.'], ['Board maximum', '128 GB', 0, 'Reported by the firmware. Some vendors fill this in wrongly.']]],
+   ['DIMM_A2', [['Size', '8 GB'], ['Maker', 'Corsair'], ['Part number', 'CMK16GX4M2B3200C16', 1, 'Search for this to buy an identical module.'], ['Speed', '3200 MT/s'], ['Voltage', '1.35 V'], ['Serial number', '00000000', 1]]],
+   ['DIMM_B2', [['Size', '8 GB'], ['Maker', 'Corsair'], ['Part number', 'CMK16GX4M2B3200C16', 1], ['Speed', '3200 MT/s'], ['Voltage', '1.35 V'], ['Serial number', '00000000', 1]]] ] },
+ { id: 'processor', name: 'Processor', icon: 'cpu', groups: [
+   ['Processor', [['Model', 'AMD Ryzen 5 5600X 6-Core Processor'], ['Socket', 'AM4', 0, 'Decides which processors fit this board.'], ['Cores and threads', '6 cores, 12 threads'], ['Family, model, stepping', '19h, 21h, 2', 1], ['Microcode', '0x0A20120E', 1]]],
+   ['Cache', [['Level 1', '6 x 32 KB data, 6 x 32 KB instruction'], ['Level 2', '6 x 512 KB'], ['Level 3', '32 MB']]],
+   ['Features', [['Instruction sets', 'SSE4.2, AVX, AVX2, AES, SHA, FMA3'], ['Virtualisation', 'AMD-V, on', 0, 'Needed for virtual machines and some Windows security features.'], ['Supported memory', 'DDR4 up to 3200 MT/s, 128 GB', 0, 'From Busview\'s processor table, not from the chip itself.']]] ] },
+ { id: 'board', name: 'Motherboard', icon: 'circuit-board', groups: [
+   ['Board', [['Maker', 'ASUSTeK COMPUTER INC.'], ['Model', 'PRIME B550M-A (WI-FI)'], ['Version', 'Rev X.0x', 1], ['Chassis', 'Desktop']]],
+   ['BIOS', [['Vendor', 'American Megatrends Inc.', 0, 'Decides which beep codes apply.'], ['Version', '3202', 1], ['Date', '15 June 2023'], ['Mode', 'UEFI']]],
+   ['Security', [['TPM', '2.0, on (AMD fTPM)', 0, 'Windows 11 needs TPM 2.0.'], ['Secure Boot', 'Off (supported)', 0, 'Windows 11 needs this capable; turning it on is a BIOS setting.']]],
+   ['Firmware tables', [['ACPI tables', 'FACP, APIC, MCFG, HPET, SSDT x 9, WSMT', 1], ['SMBIOS version', '3.3', 1]]] ] },
+ { id: 'storage', name: 'Storage', icon: 'hard-drive', groups: [
+   ['Samsung SSD 970 EVO Plus 500GB', [['Slot', 'M.2_1 (PCIe 3.0 x4 in use)'], ['Capacity', '500 GB'], ['Health', 'Good, 94% life left'], ['Power-on time', '7,980 hours'], ['Temperature', '41 °C'], ['Firmware', '2B2QEXM7', 1]]],
+   ['ST2000DM008-2FR102', [['Port', 'SATA6G_1'], ['Capacity', '2 TB'], ['Health', 'Watch: 8 reallocated sectors'], ['Power-on time', '21,340 hours'], ['Temperature', '34 °C'], ['Firmware', '0001', 1]]],
+   ['Free connections', [['M.2_2', 'Free, PCIe 3.0 x4, up to 2280', 0, 'A second NVMe drive fits here.'], ['SATA', '3 of 4 ports free']]] ] },
+ { id: 'graphics', name: 'Graphics', icon: 'monitor', groups: [
+   ['NVIDIA GeForce RTX 3060', [['Memory', '12 GB'], ['Slot', 'PCIEX16_1 (PCIe 4.0 x16)'], ['Driver', '566.36, 10 December 2025'], ['Device ID', 'VEN_10DE&DEV_2504', 1]]],
+   ['DELL U2720Q', [['Connection', 'DisplayPort'], ['Native mode', '3840 x 2160 at 60 Hz'], ['Size', '27 inch (597 x 336 mm)'], ['Made', 'Week 14, 2021'], ['Serial number', '7XK2P13', 1]]] ] },
+ { id: 'devices', name: 'Devices', icon: 'usb', groups: [
+   ['PCI', [['00:00.0', 'AMD Starship/Matisse Root Complex  VEN_1022&DEV_1480', 1], ['01:00.0', 'Samsung NVMe Controller SM981  VEN_144D&DEV_A808', 1], ['07:00.0', 'NVIDIA GeForce RTX 3060  VEN_10DE&DEV_2504', 1], ['05:00.0', 'Intel Wi-Fi 6 AX200  VEN_8086&DEV_2723', 1], ['06:00.0', 'Realtek RTL8111 Gigabit Ethernet  VEN_10EC&DEV_8168', 1]]],
+   ['USB', [['Port 2', 'Logitech USB Receiver  VID_046D&PID_C52B  Full speed', 1], ['Port 5', 'Keychron K8 Keyboard  VID_05AC&PID_024F  Full speed', 1], ['Port 9', 'SanDisk Ultra  VID_0781&PID_5581  SuperSpeed', 1]]] ] },
+ { id: 'network', name: 'Network and power', icon: 'network', groups: [
+   ['Realtek Gigabit Ethernet', [['State', 'Connected, 1 Gbps'], ['MAC address', '04:42:1A:xx:xx:xx', 1]]],
+   ['Intel Wi-Fi 6 AX200', [['State', 'Not connected'], ['MAC address', 'A4:6B:B6:xx:xx:xx', 1]]],
+   ['Battery', [['State', 'No battery (desktop)']]] ] }
+];
+function area(id) { return AREAS.filter(function (a) { return a.id === id; })[0]; }
+var BEEPS = [
+ ['AMI', '1 short', 'Memory refresh failure', ['Reseat the memory modules.', 'Try one module at a time, in each slot.', 'Replace the module that fails alone.']],
+ ['AMI', '2 short', 'Memory parity error', ['Reseat the memory modules.', 'Test each module alone.']],
+ ['AMI', '3 short', 'Base 64K memory failure', ['Reseat the memory modules.', 'Try one module at a time, in each slot.', 'Replace the module that fails alone.']],
+ ['AMI', '4 short', 'System timer failure', ['The motherboard needs repair or replacement.']],
+ ['AMI', '5 short', 'Processor failure', ['Reseat the processor and check for bent pins.', 'Check the processor power cable.']],
+ ['AMI', '6 short', 'Keyboard controller (Gate A20) failure', ['Try another keyboard.', 'The motherboard may need repair.']],
+ ['AMI', '8 short', 'Display memory failure', ['Reseat the graphics card.', 'Try another graphics card.']],
+ ['AMI', '1 long, 3 short', 'Memory test failure above 64K', ['Reseat the memory modules.', 'Test each module alone.']],
+ ['Award', '1 long, 2 short', 'Video adapter error', ['Reseat the graphics card.', 'Check the monitor cable.']],
+ ['Award', 'Repeating short', 'Power supply or motherboard fault', ['Check every power cable.', 'Try another power supply.']],
+ ['Phoenix', '1-3-3-1', 'Memory not detected or bad', ['Reseat the memory modules.']],
+ ['Dell', '2 beeps', 'No memory detected', ['Reseat the memory modules.']]
+];
+var MAKERS = ['All', 'AMI', 'AST', 'Award', 'Compaq', 'Dell', 'IBM', 'Phoenix'];
+var SNAPS = [['2 June 2025', '09:14', 'First snapshot', '46 KB'], ['12 March 2026', '18:02', 'Before BIOS update', '48 KB'], ['17 November 2026', '10:31', 'Today', '48 KB']];
+var DIFF = [['Motherboard', 'BIOS version', '2803', '3202', 'info'], ['Motherboard', 'BIOS date', '27 April 2022', '15 June 2023', 'info'], ['Storage', 'ST2000DM008 reallocated sectors', '0', '8', 'warn'],
+            ['Storage', 'ST2000DM008 power-on time', '15,028 hours', '21,340 hours', 'plain'], ['Storage', '970 EVO Plus life left', '97%', '94%', 'plain'], ['Graphics', 'NVIDIA driver', '552.22', '566.36', 'info']];
+var ADVICE = [
+ { id: 'memory', icon: 'memory-stick', q: 'Can I add memory?', kind: 'ok', verdict: 'Yes, 2 slots are free', title: 'Add 2 x 8 GB to reach 32 GB',
+   text: 'You have 2 x 8 GB DDR4-3200 in slots A2 and B2. Slots A1 and B1 are free and the board takes up to 128 GB.', spec: 'DDR4 UDIMM, 3200 MT/s, 1.35 V, 2 x 8 GB, part CMK16GX4M2B3200C16',
+   steps: ['Buy a kit that matches the specification below, ideally the same part number.', 'Fit the new modules in DIMM_A1 and DIMM_B1.', 'Take a snapshot afterwards so Busview can confirm all four are seen.'], go: 'memory' },
+ { id: 'storage', icon: 'hard-drive', q: 'Can I add a drive?', kind: 'ok', verdict: 'Yes, 1 M.2 and 3 SATA free', title: 'Room for a second NVMe drive',
+   text: 'Slot M.2_2 is free and takes a PCIe 3.0 x4 drive up to 80 mm long. Three SATA ports are free as well.', spec: 'M.2 2280 NVMe, PCIe 3.0 x4 or faster',
+   steps: ['Any M.2 2280 NVMe drive works; a PCIe 4.0 drive runs at PCIe 3.0 speed in this slot.', 'Fit it in M.2_2, below the graphics card.'], go: 'storage' },
+ { id: 'health', icon: 'activity', q: 'Is anything wearing out?', kind: 'warn', verdict: 'One drive to watch', title: 'Back up the 2 TB Seagate drive',
+   text: 'ST2000DM008 has 8 reallocated sectors. It had none in your snapshot of 12 March 2026. A rising count often comes before failure.', spec: '',
+   steps: ['Back up what is on this drive now.', 'Take another snapshot in a few weeks. If the count rises again, replace the drive.'], go: 'storage' },
+ { id: 'win11', icon: 'shield-check', q: 'Is it ready for Windows 11?', kind: 'ok', verdict: 'Meets every requirement', title: 'Windows 11 requirements are met',
+   text: 'Processor supported, TPM 2.0 on, UEFI, Secure Boot supported, 16 GB memory, 500 GB system drive. Secure Boot is switched off, which Windows 11 allows.', spec: '',
+   steps: ['Nothing is needed. To turn Secure Boot on, enable it under Boot in the BIOS setup.'], go: 'board' }
+];
+var ACTIVITY = [['10:31:08', 'Snapshot saved', 'Today, 48 KB', 'ok'], ['10:30:52', 'Scan finished', '212 values read in 1.8 seconds', 'ok'], ['10:30:52', 'Drive health read', '2 drives, administrator rights used', 'ok'],
+                ['10:30:51', 'Graphics vendor data read', 'NVIDIA driver interface found', 'ok'], ['10:30:51', 'AMD graphics data skipped', 'No AMD graphics driver is installed', 'plain'], ['10:30:50', 'Scan started', 'Busview 1.0.0, database 2026.11.1', 'info']];
+
+/* ---------- shared pieces ---------- */
+function kv(r) { return '<div class="kv"><div class="k">' + esc(r[0]) + '</div><div class="v' + (r[2] ? ' mono' : '') + '">' + esc(r[1]) + '</div>' + (r[3] ? '<div class="ex">' + esc(r[3]) + '</div>' : '') + '</div>'; }
+function grp(g, note) { return '<section class="grp"><h3>' + esc(g[0]) + (note ? '<span class="note">' + note + '</span>' : '') + '</h3>' + g[1].map(kv).join('') + '</section>'; }
+function adviceBanner(a) { return '<div class="advice' + (a.kind === 'warn' ? ' warn' : '') + '">' + ic(a.kind === 'warn' ? 'triangle-alert' : 'lightbulb') + '<div><h4>' + esc(a.title) + '</h4><p>' + esc(a.text) + '</p>' + (a.spec ? '<span class="spec">' + esc(a.spec) + '</span>' : '') + '</div><div class="acts">' + (a.spec ? btn('Copy specification', { icon: 'copy', cls: 'sm' }) : '') + '</div></div>'; }
+function slotsRow() { return '<div class="slots">' + [['DIMM_A1', 0], ['DIMM_A2', 1], ['DIMM_B1', 0], ['DIMM_B2', 1]].map(function (s) {
+  return s[1] ? '<div class="slot"><span class="nm">' + s[0] + '</span><span class="big">8 GB</span><span class="sm">DDR4-3200, Corsair</span>' + chip('ok', 'Fitted') + '</div>'
+              : '<div class="slot free"><span class="nm">' + s[0] + '</span><span class="big muted">Empty</span><span class="sm">Takes DDR4 UDIMM</span>' + chip('plain', 'Free') + '</div>'; }).join('') + '</div>'; }
+function refusal() { return '<div class="refuse">' + ic('lock') + '<div class="grow"><b>Drive health was not read.</b><div class="muted">Reading SMART and NVMe health needs administrator rights. Everything else on this page is complete.</div></div>' + btn('Restart as administrator', { icon: 'shield-check' }) + '</div>'; }
+function areaBody(id) {
+  var a = area(id), out = '';
+  if (id === 'memory') out += adviceBanner(ADVICE[0]) + slotsRow();
+  if (id === 'storage') { out += S.st.user ? refusal() : adviceBanner(ADVICE[2]); out += adviceBanner(ADVICE[1]); }
+  if (id === 'board') out += adviceBanner(ADVICE[3]);
+  a.groups.forEach(function (g) {
+    var note = '';
+    if (id === 'storage' && g[0].indexOf('ST2000') === 0) note = S.st.user ? chip('plain', 'Health not read') : chip('warn', 'Watch');
+    if (id === 'storage' && g[0].indexOf('Samsung') === 0) note = S.st.user ? chip('plain', 'Health not read') : chip('ok', 'Good');
+    var gg = g;
+    if (id === 'storage' && S.st.user) gg = [g[0], g[1].filter(function (r) { return ['Health', 'Power-on time', 'Temperature'].indexOf(r[0]) < 0; })];
+    out += grp(gg, note);
+  });
+  return out;
+}
+function tilesOverview() {
+  var t = [['memory', 'memory-stick', 'Memory', '16 GB DDR4', '2 of 4 slots used'], ['processor', 'cpu', 'Processor', 'Ryzen 5 5600X', '6 cores, AM4'], ['board', 'circuit-board', 'Motherboard', 'PRIME B550M-A', 'BIOS 3202, AMI'],
+           ['storage', 'hard-drive', 'Storage', '2.5 TB, 2 drives', S.st.user ? 'Health not read' : 'One drive to watch'], ['graphics', 'monitor', 'Graphics', 'RTX 3060 12 GB', '1 display, 4K'], ['devices', 'usb', 'Devices', '5 PCI, 3 USB', 'All have drivers'],
+           ['network', 'network', 'Network', 'Ethernet, 1 Gbps', 'Wi-Fi not connected'], ['board', 'shield-check', 'Windows 11', 'Ready', 'TPM 2.0, UEFI']];
+  return '<div class="tiles">' + t.map(function (x) { return '<button type="button" class="tile" data-go="' + x[0] + '"><div class="lab">' + ic(x[1]) + x[2] + '</div><div class="val">' + x[3] + '</div><div class="more">' + x[4] + '</div></button>'; }).join('') + '</div>';
+}
+function machineHero() { return '<div class="hero">' + MARK.replace('class="mark"', 'class="mark" style="width:44px;height:44px"') + '<div class="grow"><div class="big">DESKTOP-7QK2M1</div><div class="muted">ASUS PRIME B550M-A (WI-FI), Windows 11 Pro 24H2, scanned today at 10:30</div></div>' + (S.st.user ? chip('info', 'Standard user') : chip('ok', 'Administrator')) + '</div>'; }
+function adviceRows() { return '<section class="grp"><h3>Advice<span class="note">4 answers</span></h3><table class="t"><tbody>' + ADVICE.map(function (a) {
+  var v = (a.id === 'health' && S.st.user) ? chip('plain', 'Needs administrator') : chip(a.kind, a.verdict);
+  return '<tr tabindex="0" data-go="' + a.go + '"><td style="width:28px">' + ic(a.icon) + '</td><td><b>' + esc(a.title) + '</b><div class="muted">' + esc(a.q) + '</div></td><td style="text-align:right">' + v + '</td></tr>'; }).join('') + '</tbody></table></section>'; }
+
+function vSnapshots() {
+  if (S.st.nosnap) return { head: [btn('Take snapshot', { cls: 'primary', icon: 'camera' })], status: 'No snapshots', flush: false,
+    body: '<div class="empty">' + ic('camera') + '<h3>No snapshots yet</h3><div>A snapshot saves what Busview sees now, as one file. Take one today and compare it later to see what changed: a module that vanished, a drive wearing out, a new BIOS.</div>' + btn('Take snapshot', { cls: 'primary', icon: 'camera' }) + '</div>' };
+  if (S.comparing) return { head: [btn('Back to snapshots', { act: 'uncompare', icon: 'arrow-left' }), btn('Export differences', { icon: 'download' })], status: '6 differences between ' + SNAPS[S.snapA][0] + ' and ' + SNAPS[S.snapB][0] + ', 206 values unchanged', flush: false,
+    body: '<div class="hero"><div class="grow"><div class="big">' + SNAPS[S.snapA][0] + ' compared with ' + SNAPS[S.snapB][0] + '</div><div class="muted">6 values changed, 206 are the same. One change needs attention.</div></div>' + chip('warn', '1 to watch') + '</div>'
+      + '<section class="grp"><h3>What changed</h3><table class="t diff"><thead><tr><th>Area</th><th>Value</th><th>' + SNAPS[S.snapA][0] + '</th><th>' + SNAPS[S.snapB][0] + '</th><th></th></tr></thead><tbody>'
+      + DIFF.map(function (d) { return '<tr><td>' + d[0] + '</td><td>' + d[1] + '</td><td class="was mono">' + d[2] + '</td><td class="mono"><b>' + d[3] + '</b></td><td style="text-align:right">' + chip(d[4], d[4] === 'warn' ? 'Watch' : d[4] === 'info' ? 'Changed' : 'Expected') + '</td></tr>'; }).join('') + '</tbody></table></section>' };
+  return { head: [btn('Open folder', { icon: 'folder-open' }), btn('Compare selected', { act: 'compare', icon: 'git-compare' }), btn('Take snapshot', { cls: 'primary', icon: 'camera' })], status: '3 snapshots, 2 selected to compare', flush: false,
+    body: '<section class="grp"><h3>Snapshots<span class="note">Select two to compare</span></h3><table class="t"><thead><tr><th style="width:36px"></th><th>Taken</th><th>Note</th><th class="num">Size</th><th></th></tr></thead><tbody>'
+      + SNAPS.map(function (s, i) { var on = i === S.snapA || i === S.snapB; return '<tr tabindex="0" data-snap="' + i + '" class="' + (on ? 'sel' : '') + '"><td>' + ic(on ? 'square-check' : 'square') + '</td><td>' + s[0] + ' <span class="muted">' + s[1] + '</span></td><td>' + s[2] + '</td><td class="num mono">' + s[3] + '</td><td style="text-align:right"><button type="button" class="btn quiet sm" data-act="delete">Delete</button></td></tr>'; }).join('')
+      + '</tbody></table></section><p class="muted" style="margin:0">Snapshots are JSON files in <span class="mono">Documents\\Busview\\Snapshots</span>. They stay on this computer.</p>' };
+}
+function vBeeps() {
+  var q = S.st.nomatch ? 'zzz' : S.q, list = BEEPS.map(function (b, i) { return { b: b, i: i }; }).filter(function (x) { return (S.beepMaker === 'All' || x.b[0] === S.beepMaker) && (!q || (x.b[1] + ' ' + x.b[2]).toLowerCase().indexOf(q.toLowerCase()) >= 0); });
+  var sel = BEEPS[S.beepSel], shown = list.some(function (x) { return x.i === S.beepSel; });
+  var right = shown ? '<span class="lbl">' + sel[0] + '</span><h3 class="beep">' + sel[1] + '</h3><p><b>' + sel[2] + '</b></p><span class="lbl">What to try</span><ol class="steps">' + sel[3].map(function (s) { return '<li>' + s + '</li>'; }).join('') + '</ol>' + btn('Copy', { icon: 'copy', cls: 'sm' })
+    : '<h3>About beep codes</h3><p>When a computer cannot start, its BIOS sounds a pattern of beeps to say which test failed. Count the long and short beeps, then pick the pattern on the left.</p><p class="muted">This computer\'s BIOS is from American Megatrends (AMI), so the list starts on AMI.</p>';
+  var left = '<div style="padding:12px 16px;display:flex;flex-direction:column;gap:10px"><div class="tools"><label class="field">' + ic('search') + '<input id="beep-q" type="text" placeholder="Search patterns and meanings" value="' + esc(q) + '" aria-label="Search beep codes"></label></div><div class="pills">'
+    + MAKERS.map(function (m) { return '<button type="button" class="pill" data-maker="' + m + '" aria-pressed="' + (m === S.beepMaker) + '">' + m + (m === 'AMI' ? ' (this computer)' : '') + '</button>'; }).join('') + '</div></div>'
+    + (list.length ? '<table class="t"><thead><tr><th>Pattern</th><th>Meaning</th><th>BIOS</th></tr></thead><tbody>' + list.map(function (x) { return '<tr tabindex="0" data-beep="' + x.i + '" class="' + (x.i === S.beepSel ? 'sel' : '') + '"><td class="beep">' + x.b[1] + '</td><td>' + x.b[2] + '</td><td class="muted">' + x.b[0] + '</td></tr>'; }).join('') + '</tbody></table>'
+      : '<div class="empty" style="padding:40px 0">' + ic('search-x') + '<h3>No code matches "' + esc(q) + '"</h3><div>Try the number of beeps, such as "3 short", or choose All to search every BIOS maker.</div>' + btn('Clear search', { act: 'clearq' }) + '</div>');
+  return { head: [], status: list.length + ' of 244 codes shown, ' + (S.beepMaker === 'All' ? 'all 7 BIOS makers' : S.beepMaker), flush: true, body: '<div class="split"><div class="l">' + left + '</div><div class="r">' + right + '</div></div>' };
+}
+function vActivity() { return { head: [btn('Open log file', { icon: 'file-text' }), btn('Copy', { icon: 'copy' })], status: '6 entries from this session', flush: false,
+  body: '<section class="grp"><table class="t"><tbody>' + ACTIVITY.map(function (a) { return '<tr><td class="mono muted" style="width:84px">' + a[0] + '</td><td><b>' + a[1] + '</b></td><td class="muted">' + a[2] + '</td><td style="text-align:right">' + chip(a[3], a[3] === 'ok' ? 'Done' : a[3] === 'info' ? 'Started' : 'Skipped') + '</td></tr>'; }).join('') + '</tbody></table></section>' }; }
+function sgc(name, opts, cur) { return '<div class="sg" role="group">' + opts.map(function (o) { return '<button type="button" data-set="' + name + '" data-val="' + o[0] + '" aria-pressed="' + (o[0] === cur) + '">' + o[1] + '</button>'; }).join('') + '</div>'; }
+function setrow(t, d, c) { return '<div class="setrow"><div><div>' + t + '</div><div class="d">' + d + '</div></div>' + c + '</div>'; }
+function vSettings() {
+  var pages = [['general', 'General'], ['busview', 'Busview'], ['logging', 'Logging']];
+  var tabs = '<div class="tabs" role="tablist">' + pages.map(function (p) { return '<button type="button" class="tab" role="tab" data-setpage="' + p[0] + '" aria-selected="' + (p[0] === S.setPage) + '">' + p[1] + '</button>'; }).join('') + '</div>';
+  var body = S.setPage === 'general' ? '<section class="grp"><h3>Appearance</h3>' + setrow('Theme', 'Follow Windows, or always light or dark.', sgc('theme', [['system', 'Follow system'], ['light', 'Light'], ['dark', 'Dark']], S.theme))
+      + setrow('Density', 'How much space rows and controls take.', sgc('density', [['compact', 'Compact'], ['normal', 'Normal'], ['spacious', 'Spacious']], S.density)) + setrow('Language', 'English (United Kingdom)', btn('Change', {})) + '</section>'
+    : S.setPage === 'busview' ? '<section class="grp"><h3>Reading</h3>' + setrow('Explain each value', 'Show a line under each value saying what it means and whether it matters.', '<button type="button" class="sw" role="switch" data-act="explain" aria-checked="' + S.explain + '" aria-label="Explain each value"></button>')
+      + setrow('Sizes', 'Show capacities the way drive makers do (GB) or the way Windows does (GiB).', sgc('units', [['gb', 'GB'], ['gib', 'GiB']], 'gb')) + '</section>'
+      + '<section class="grp"><h3>Snapshots</h3>' + setrow('Snapshot folder', '<span class="mono">C:\\Users\\Sam\\Documents\\Busview\\Snapshots</span>', btn('Change', {})) + setrow('Hide serial numbers in exports', 'Replace serial numbers and MAC addresses when a report or snapshot is exported.', '<button type="button" class="sw" role="switch" aria-checked="true" aria-label="Hide serial numbers in exports"></button>') + '</section>'
+      + '<section class="grp"><h3>Compatibility database</h3>' + setrow('Version 2026.11.1', 'Board specifications, processor limits and 244 beep codes. Updated separately from Busview.', btn('Check for update', { icon: 'refresh-cw' })) + '</section>'
+    : '<section class="grp"><h3>Log</h3>' + setrow('Keep a log file', 'What Busview did, the same record Activity shows.', '<button type="button" class="sw" role="switch" aria-checked="true" aria-label="Keep a log file"></button>') + setrow('Log folder', '<span class="mono">%LOCALAPPDATA%\\Busview\\Logs</span>', btn('Open', {})) + '</section>';
+  return { head: [], status: 'Settings are saved as you change them', flush: true, body: tabs + '<div class="content">' + body + '</div>' };
+}
+function vAbout() { return { head: [], status: 'Busview 1.0.0', flush: false, body: '<div class="hero about">' + MARK.replace('class="mark"', 'class="mark" style="width:72px;height:72px"') + '<div class="grow"><div class="big">Busview</div><div class="muted">See what is inside. Know what to do next.</div></div></div>'
+  + grp(['Version', [['Busview', '1.0.0 (64-bit)', 1], ['Compatibility database', '2026.11.1', 1], ['Running as', S.st.user ? 'Standard user' : 'Administrator'], ['Kernel driver', 'None. Busview reads everything from user mode.']]])
+  + grp(['Links', [['Website', 'rizonesoft.com/busview'], ['Source and issues', 'github.com/rizonesoft/Busview'], ['Crash reports', 'Written beside the program. Nothing is sent.']]]) }; }
+function scanOverlay() { return '<div class="scan">' + MARK.replace('class="mark"', 'class="mark" style="width:56px;height:56px"') + '<div style="font-size:16px;font-weight:600">Reading this computer</div><div class="prog" role="progressbar" aria-valuenow="58" aria-valuemin="0" aria-valuemax="100"><i></i></div><div class="muted">Storage: asking each drive for its health record</div><div class="muted" style="font-size:12px">Nothing is changed and nothing leaves this computer.</div></div>'; }
+function dialog() { return '<div class="scrim"><div class="dlg" role="alertdialog" aria-labelledby="dlg-t"><h3 id="dlg-t">Delete the snapshot from 12 March 2026?</h3><p>This deletes 1 file (48 KB), "Before BIOS update", from the snapshot folder.</p><p><b>This cannot be undone.</b> Comparisons that used it will no longer be possible.</p><div class="acts">' + btn('Cancel', { act: 'closedlg' }) + btn('Delete snapshot', { cls: 'danger', act: 'closedlg', icon: 'trash-2' }) + '</div></div></div>'; }
+var COMMON = { snapshots: ['Snapshots', vSnapshots], beeps: ['Beep codes', vBeeps], activity: ['Activity', vActivity], settings: ['Settings', vSettings], about: ['About', vAbout] };
+var TAIL = [['activity', 'activity', 'Activity'], ['settings', 'settings', 'Settings'], ['about', 'info', 'About']];
+var explainBtn = function () { return '<button type="button" class="btn" data-act="explain" aria-pressed="' + S.explain + '">' + ic(S.explain ? 'toggle-right' : 'toggle-left') + 'Explain</button>'; };
+var scanBtns = function () { return [btn('Rescan', { icon: 'refresh-cw' }), btn('Export report', { icon: 'download' }), btn('Take snapshot', { cls: 'primary', icon: 'camera' })]; };
+
+/* ---------- the sections: Overview, Board, one per part of the machine, then Snapshots and Beep codes ---------- */
+var A = { first: 'overview',
+  nav: function () { return [['overview', 'layout-dashboard', 'Overview'], ['map', 'map', 'Board', S.st.user ? '' : 'dot']].concat(AREAS.map(function (a) { return [a.id, a.icon, a.name, a.id === 'storage' && !S.st.user ? 'dot' : '']; })).concat([['-'], ['snapshots', 'camera', 'Snapshots', S.st.nosnap ? '' : '3'], ['beeps', 'volume-2', 'Beep codes']]); },
+  view: function (id) {
+    if (id === 'overview') return { title: 'Overview', head: scanBtns(), status: '212 values read from this computer, 4 pieces of advice', body: machineHero() + tilesOverview() + adviceRows() };
+    if (id === 'map') return { title: 'Board', sub: 'ASUS PRIME B550M-A (WI-FI)', head: [btn('Rescan', { icon: 'refresh-cw' })], flush: true, status: '15 slots and connectors: 7 fitted, 8 free' + (S.st.user ? '' : ', 1 to watch'),
+      body: '<div class="split"><div class="l"><div class="map">' + boardMap() + '</div><div class="legend"><span><i class="fit"></i>Fitted</span><span><i class="free"></i>Free</span><span><i class="warn"></i>Needs attention</span><span style="margin-left:auto">Arrow keys move between parts</span></div></div><div class="r">' + inspector() + '</div></div>' };
+    var a = area(id); if (a) return { title: a.name, head: [explainBtn(), btn('Copy', { icon: 'copy' })], status: a.groups.reduce(function (n, g) { return n + g[1].length; }, 0) + ' values in ' + a.name + (S.explain ? ', explanations shown' : ''), body: areaBody(id) };
+  } };
+
+/* ---------- the Board section: a diagram of the slots and connectors; selecting one opens its details and advice. ---------- */
+var PARTS = {
+ 'cpu': ['Processor socket', 'fit', 'AMD Ryzen 5 5600X', [['Socket', 'AM4'], ['Cores and threads', '6 cores, 12 threads'], ['Supported memory', 'DDR4 up to 3200 MT/s']], '', 'processor'],
+ 'dimm-a1': ['DIMM_A1', 'free', 'Empty memory slot', [['Takes', 'DDR4 UDIMM, up to 32 GB'], ['Pairs with', 'DIMM_B1']], 'Fit one module of a 2 x 8 GB DDR4-3200 kit here and the other in DIMM_B1 to reach 32 GB.', 'memory'],
+ 'dimm-a2': ['DIMM_A2', 'fit', '8 GB DDR4-3200', [['Maker', 'Corsair'], ['Part number', 'CMK16GX4M2B3200C16', 1], ['Voltage', '1.35 V'], ['Running speed', '3200 MT/s']], 'To add more, buy this same part number and fit it in the two free slots.', 'memory'],
+ 'dimm-b1': ['DIMM_B1', 'free', 'Empty memory slot', [['Takes', 'DDR4 UDIMM, up to 32 GB'], ['Pairs with', 'DIMM_A1']], 'Fit the second module of the kit here.', 'memory'],
+ 'dimm-b2': ['DIMM_B2', 'fit', '8 GB DDR4-3200', [['Maker', 'Corsair'], ['Part number', 'CMK16GX4M2B3200C16', 1], ['Voltage', '1.35 V'], ['Running speed', '3200 MT/s']], '', 'memory'],
+ 'm2-1': ['M.2_1', 'fit', 'Samsung 970 EVO Plus 500 GB', [['Link', 'PCIe 3.0 x4 (slot allows 4.0)'], ['Health', 'Good, 94% life left'], ['Power-on time', '7,980 hours']], '', 'storage'],
+ 'm2-2': ['M.2_2', 'free', 'Empty M.2 slot', [['Takes', 'NVMe, PCIe 3.0 x4'], ['Length', 'Up to 2280 (80 mm)']], 'A second NVMe drive fits here. A PCIe 4.0 drive works, at PCIe 3.0 speed.', 'storage'],
+ 'pcie16': ['PCIEX16_1', 'fit', 'NVIDIA GeForce RTX 3060', [['Link', 'PCIe 4.0 x16'], ['Memory', '12 GB'], ['Driver', '566.36']], '', 'graphics'],
+ 'pcie1a': ['PCIEX1_1', 'free', 'Empty PCIe x1 slot', [['Takes', 'PCIe 3.0 x1 cards']], '', 'devices'],
+ 'pcie1b': ['PCIEX1_2', 'free', 'Empty PCIe x1 slot', [['Takes', 'PCIe 3.0 x1 cards']], '', 'devices'],
+ 'sata1': ['SATA6G_1', 'warn', 'Seagate ST2000DM008 2 TB', [['Health', 'Watch: 8 reallocated sectors'], ['Power-on time', '21,340 hours'], ['Temperature', '34 °C']], 'Back up this drive. It had no reallocated sectors on 12 March 2026.', 'storage'],
+ 'sata2': ['SATA6G_2', 'free', 'Free SATA port', [['Takes', 'SATA 6 Gb/s drives']], '', 'storage'], 'sata3': ['SATA6G_3', 'free', 'Free SATA port', [['Takes', 'SATA 6 Gb/s drives']], '', 'storage'], 'sata4': ['SATA6G_4', 'free', 'Free SATA port', [['Takes', 'SATA 6 Gb/s drives']], '', 'storage'],
+ 'wifi': ['M.2 (Wi-Fi)', 'fit', 'Intel Wi-Fi 6 AX200', [['State', 'Not connected'], ['Device ID', 'VEN_8086&DEV_2723', 1]], '', 'network']
+};
+function part(id, x, y, w, h, label, sub) { var p = PARTS[id], st = (id === 'sata1' && S.st.user) ? 'fit' : p[1];
+  return '<g class="part ' + st + (S.part === id ? ' sel' : '') + '" data-part="' + id + '" tabindex="0" role="button" aria-label="' + esc(p[0] + ': ' + p[2]) + '"><rect x="' + x + '" y="' + y + '" width="' + w + '" height="' + h + '" rx="4"/>'
+    + (w >= h ? '<text class="t1" x="' + (x + 8) + '" y="' + (y + h / 2 + (sub ? -2 : 4)) + '">' + label + '</text>' + (sub ? '<text x="' + (x + 8) + '" y="' + (y + h / 2 + 12) + '">' + sub + '</text>' : '')
+              : '<text class="t1" transform="translate(' + (x + w / 2 + 4) + ' ' + (y + h - 8) + ') rotate(-90)">' + label + (sub ? '  ' + sub : '') + '</text>') + '</g>'; }
+function boardMap() { return '<svg viewBox="0 0 640 560" width="640" height="560" role="group" aria-label="Diagram of this computer\'s slots and connectors"><rect class="pcb" x="10" y="10" width="620" height="540" rx="14"/>'
+  + '<g class="fixed"><rect x="22" y="26" width="46" height="170" rx="4"/><rect x="560" y="470" width="52" height="60" rx="4"/></g><text x="26" y="212">Rear ports</text><text x="556" y="544">Chipset</text>'
+  + part('cpu', 150, 60, 150, 150, 'Ryzen 5 5600X', 'AM4 socket')
+  + part('dimm-a1', 370, 40, 38, 250, 'A1', 'Empty') + part('dimm-a2', 418, 40, 38, 250, 'A2', '8 GB') + part('dimm-b1', 466, 40, 38, 250, 'B1', 'Empty') + part('dimm-b2', 514, 40, 38, 250, 'B2', '8 GB')
+  + part('m2-1', 150, 250, 190, 40, 'M.2_1', '970 EVO Plus 500 GB') + part('wifi', 30, 250, 100, 40, 'Wi-Fi', 'AX200')
+  + part('pcie16', 40, 320, 420, 46, 'PCIEX16_1', 'GeForce RTX 3060 12 GB') + part('pcie1a', 40, 380, 130, 30, 'PCIEX1_1') + part('m2-2', 190, 380, 190, 40, 'M.2_2', 'Empty') + part('pcie1b', 40, 440, 130, 30, 'PCIEX1_2')
+  + part('sata1', 500, 320, 110, 30, 'SATA 1', '') + part('sata2', 500, 356, 110, 30, 'SATA 2') + part('sata3', 500, 392, 110, 30, 'SATA 3') + part('sata4', 500, 428, 110, 30, 'SATA 4')
+  + '<text x="40" y="530">A diagram of what the firmware reports, not a picture of the board: positions are schematic.</text></svg>'; }
+function inspector() { var p = PARTS[S.part], st = (S.part === 'sata1' && S.st.user) ? 'fit' : p[1], rows = (S.part === 'sata1' && S.st.user) ? [['Health', 'Not read: needs administrator rights']] : p[3];
+  return '<span class="lbl">' + esc(p[0]) + '</span><h3>' + esc(p[2]) + '</h3><div>' + (st === 'free' ? chip('plain', 'Free') : st === 'warn' ? chip('warn', 'Watch') : chip('ok', 'Fitted')) + '</div>'
+    + '<section class="grp">' + rows.map(function (r) { return '<div class="kv" style="grid-template-columns:110px minmax(0,1fr)"><div class="k">' + esc(r[0]) + '</div><div class="v' + (r[2] ? ' mono' : '') + '">' + esc(r[1]) + '</div></div>'; }).join('') + '</section>'
+    + (p[4] && !(S.part === 'sata1' && S.st.user) ? '<span class="lbl">Advice</span><p>' + esc(p[4]) + '</p>' : '') + '<div style="display:flex;gap:8px;flex-wrap:wrap">' + btn('Copy', { icon: 'copy', cls: 'sm' }) + '<button type="button" class="btn quiet sm" data-go="' + p[5] + '">Open ' + area(p[5]).name + '</button></div>'; }
+/* ---------- the window ---------- */
+function render() {
+  var D = A; if (!S.sec) S.sec = D.first;
+  var v = (D.view(S.sec)) || null, common = COMMON[S.sec];
+  if (!v && common) { v = common[1](); v.title = common[0]; }
+  var nav = D.nav().map(function (n) { if (n[0] === '-') return '<div class="sep"></div>';
+    return '<button type="button" class="nav" data-sec="' + n[0] + '"' + (n[0] === S.sec ? ' aria-current="page"' : '') + '>' + ic(n[1]) + '<span>' + n[2] + '</span>' + (n[3] === 'dot' ? '<span class="dot" title="Needs attention"></span>' : n[3] ? '<span class="count">' + n[3] + '</span>' : '') + '</button>'; }).join('')
+    + '<div class="grow"></div><div class="sep"></div>' + TAIL.map(function (n) { return '<button type="button" class="nav" data-sec="' + n[0] + '"' + (n[0] === S.sec ? ' aria-current="page"' : '') + '>' + ic(n[1]) + '<span>' + n[2] + '</span></button>'; }).join('');
+  app.setAttribute('data-explain', S.explain ? 'on' : 'off');
+  app.innerHTML = '<div class="caption">' + MARK + '<span class="ttl"><b>Busview</b></span><span class="wc"><span>' + ic('minus') + '</span><span>' + ic('square') + '</span><span>' + ic('x') + '</span></span></div>'
+    + '<div class="body"><nav class="side" aria-label="Sections">' + nav + '</nav><div class="main" style="position:relative"><div class="head"><h2>' + v.title + (v.sub ? '<span class="sub">' + v.sub + '</span>' : '') + '</h2>' + (v.head || []).join('') + '</div>'
+    + '<div class="content' + (v.flush ? ' flush' : '') + '">' + v.body + '</div>' + (S.st.scan ? scanOverlay() : '') + '</div></div>'
+    + '<div class="status"><span>' + (S.st.scan ? 'Reading this computer: 123 of 212 values' : v.status) + '</span><span class="r"><span>' + (S.st.user ? 'Standard user' : 'Administrator') + '</span><span>Database 2026.11.1</span></span></div>' + (S.st.dialog ? dialog() : '');
+  if (window.lucide) window.lucide.createIcons();
+}
+function go(sec) { S.sec = sec; S.comparing = false; }
+app.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-sec],[data-go],[data-act],[data-maker],[data-beep],[data-snap],[data-part],[data-set],[data-setpage]'); if (!t) return;
+  var d = t.dataset;
+  if (d.sec) go(d.sec);
+  if (d.go) go(d.go);
+  if (d.act === 'explain') S.explain = !S.explain;
+  if (d.act === 'compare') S.comparing = true;
+  if (d.act === 'uncompare') S.comparing = false;
+  if (d.act === 'delete') { S.st.dialog = true; e.stopPropagation(); }
+  if (d.act === 'closedlg') S.st.dialog = false;
+  if (d.act === 'clearq') { S.q = ''; S.st.nomatch = false; }
+  if (d.maker) S.beepMaker = d.maker;
+  if (d.beep) S.beepSel = +d.beep;
+  if (d.snap && d.act !== 'delete' && !e.target.closest('[data-act="delete"]')) { var i = +d.snap; if (i !== S.snapA && i !== S.snapB) { S.snapA = S.snapB; S.snapB = i; if (S.snapA > S.snapB) { var x = S.snapA; S.snapA = S.snapB; S.snapB = x; } } }
+  if (d.part) S.part = d.part;
+  if (d.set === 'theme') { S.theme = d.val; if (d.val !== 'system') setTheme(d.val); }
+  if (d.set === 'density') S.density = d.val;
+  if (d.setpage) S.setPage = d.setpage;
+  render(); syncStates();
+});
+app.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('tr[tabindex], g[tabindex]')) { e.preventDefault(); e.target.dispatchEvent(new MouseEvent('click', { bubbles: true })); } });
+app.addEventListener('input', function (e) {
+  if (e.target.id !== 'beep-q') return;
+  var id = e.target.id, pos = e.target.selectionStart; S.q = e.target.value; S.st.nomatch = false;
+  render(); syncStates(); var el = document.getElementById(id); if (el) { el.focus(); el.setSelectionRange(pos, pos); }
+});
+function setTheme(t) { app.setAttribute('data-mock', t); document.querySelectorAll('#themes button').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.theme === t); }); }
+function syncStates() { document.querySelectorAll('#states button').forEach(function (b) { b.setAttribute('aria-pressed', !!S.st[b.dataset.st]); }); }
+document.getElementById('themes').addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) setTheme(b.dataset.theme); });
+document.getElementById('states').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; var k = b.dataset.st; S.st[k] = !S.st[k];
+  if (S.st[k]) { if (k === 'nosnap' || k === 'dialog') go('snapshots'); if (k === 'nomatch') go('beeps'); if (k === 'user') go('storage'); if (k === 'scan') S.sec = null; }
+  if (k === 'nosnap' && S.st[k]) S.st.dialog = false; render(); syncStates(); });
+var dark = false; try { dark = (document.documentElement.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')) === 'dark'; } catch (err) { dark = false; }
+var P = new URLSearchParams(location.search);
+if (P.get('theme')) dark = P.get('theme') === 'dark';
+(P.get('state') || '').split(',').forEach(function (k) { if (k) S.st[k] = true; });
+if (P.get('view')) S.sec = P.get('view');
+if (P.get('part')) S.part = P.get('part');
+if (P.get('page')) S.setPage = P.get('page');
+if (P.get('maker')) S.beepMaker = P.get('maker');
+if (P.get('explain')) S.explain = true;
+if (P.get('compare')) S.comparing = true;
+if (P.get('capture')) document.documentElement.classList.add('capture');
+setTheme(dark ? 'dark' : 'light'); render(); syncStates();
+})();
+</script>
+</body>
+</html>

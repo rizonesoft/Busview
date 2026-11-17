@@ -1,0 +1,28 @@
+# The pinned Resolute-SDK: a clone at the commit sdk.json names, or a link to the developer's checkout.
+# No trailing slash: a directory junction is matched as a file by some git versions.
+/sdk
+
+# Derived output
+/build/
+/Bin/
+__pycache__/
+*.pyc
+
+# Local-only reference material: the last clone of the retired BiosCodes repository and the bundle of its history.
+# What Busview needs from it is tracked under reference/beepcodes-au3/.
+/reference/BiosCodes/
+/reference/*.bundle
+
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*~
+Thumbs.db
+Desktop.ini
+
+# Editors
+.vs/
+.vscode/
+.idea/
+*.user

@@ -1,0 +1,36 @@
+name: Bug
+description: Something in Busview does not work as it should.
+labels: ["bug"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Busview version
+      description: From the About section.
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      description: For example "Windows 11 24H2".
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: What you did
+      description: The steps, in order.
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: activity
+    attributes:
+      label: Activity
+      description: Paste the lines from the Activity section (its Copy button), or attach the crash report if there was one.

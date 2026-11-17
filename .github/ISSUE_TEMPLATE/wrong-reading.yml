@@ -1,0 +1,39 @@
+name: Wrong or missing reading
+description: Busview shows a value that is wrong, or misses hardware that is there.
+labels: ["reading"]
+body:
+  - type: markdown
+    attributes:
+      value: Busview shows what the firmware and Windows report. Tell us what it showed and what is really in the computer.
+  - type: input
+    id: version
+    attributes:
+      label: Busview version
+      description: From the About section, with the database version.
+    validations:
+      required: true
+  - type: input
+    id: machine
+    attributes:
+      label: Computer or motherboard
+      description: Maker and model, for example "Lenovo ThinkPad T14 Gen 3" or "MSI B650 Tomahawk".
+    validations:
+      required: true
+  - type: textarea
+    id: shown
+    attributes:
+      label: What Busview shows
+    validations:
+      required: true
+  - type: textarea
+    id: real
+    attributes:
+      label: What is really there, and how you know
+      description: A label on the part, the maker's specification page, another tool's reading.
+    validations:
+      required: true
+  - type: textarea
+    id: report
+    attributes:
+      label: Report
+      description: Attach the file from Export report. Serial numbers are hidden unless you turned that off.

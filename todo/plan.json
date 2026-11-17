@@ -1,0 +1,26 @@
+{
+  "title": "Busview implementation plan",
+  "acceptance": "Busview.exe builds from a clean clone against the pinned SDK, reads a real machine with no kernel driver, gives memory, storage, drive health and Windows 11 advice from it, saves and compares snapshots, explains every beep code, and every screen, control and state in design/SPEC.md works 1:1 with the design.",
+  "phases": {
+    "0": "Repository and build",
+    "1": "Reading the machine",
+    "2": "Database and advice",
+    "3": "Snapshots and beep codes",
+    "4": "The window",
+    "5": "Distribution",
+    "99": "Manual, operator only"
+  },
+  "needs": [
+    "windows-host",
+    "display-session",
+    "attended",
+    "operator",
+    "owner-decision",
+    "sdk-framework"
+  ],
+  "waiting": [
+    "operator",
+    "owner-decision",
+    "sdk-framework"
+  ]
+}
