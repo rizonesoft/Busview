@@ -62,6 +62,7 @@ html.capture body { padding:0; background:transparent } html.capture .page > :no
 .btn.danger { background:var(--error); border-color:var(--error); color:var(--onAccent); font-weight:600 } .btn.quiet { border-color:transparent; background:none; color:var(--accent); padding:0 6px } .btn.sm { height:26px; padding:0 8px; font-size:12px }
 .content { overflow:auto; padding:16px; display:flex; flex-direction:column; gap:16px; min-height:0 }
 .content.flush { padding:0; gap:0 }
+.content > * { flex:none } .content > .split, .content > .content { flex:1 1 auto; min-height:0 }
 .status { display:flex; align-items:center; gap:16px; padding:0 12px; background:var(--statusBar); color:var(--statusBarText); border-top:1px solid var(--hair); font-size:12px }
 .status .r { margin-left:auto; display:flex; gap:16px }
 .grp { border:1px solid var(--hair); border-radius:8px; background:var(--toolbar); overflow:hidden }
@@ -273,7 +274,7 @@ function vBeeps() {
     + MAKERS.map(function (m) { return '<button type="button" class="pill" data-maker="' + m + '" aria-pressed="' + (m === S.beepMaker) + '">' + m + (m === 'AMI' ? ' (this computer)' : '') + '</button>'; }).join('') + '</div></div>'
     + (list.length ? '<table class="t"><thead><tr><th>Pattern</th><th>Meaning</th><th>BIOS</th></tr></thead><tbody>' + list.map(function (x) { return '<tr tabindex="0" data-beep="' + x.i + '" class="' + (x.i === S.beepSel ? 'sel' : '') + '"><td class="beep">' + x.b[1] + '</td><td>' + x.b[2] + '</td><td class="muted">' + x.b[0] + '</td></tr>'; }).join('') + '</tbody></table>'
       : '<div class="empty" style="padding:40px 0">' + ic('search-x') + '<h3>No code matches "' + esc(q) + '"</h3><div>Try the number of beeps, such as "3 short", or choose All to search every BIOS maker.</div>' + btn('Clear search', { act: 'clearq' }) + '</div>');
-  return { head: [], status: list.length + ' of 244 codes shown, ' + (S.beepMaker === 'All' ? 'all 7 BIOS makers' : S.beepMaker), flush: true, body: '<div class="split"><div class="l">' + left + '</div><div class="r">' + right + '</div></div>' };
+  return { head: [], status: list.length + ' of 177 codes shown, ' + (S.beepMaker === 'All' ? 'all 7 BIOS makers' : S.beepMaker), flush: true, body: '<div class="split"><div class="l">' + left + '</div><div class="r">' + right + '</div></div>' };
 }
 function vActivity() { return { head: [btn('Open log file', { icon: 'file-text' }), btn('Copy', { icon: 'copy' })], status: '6 entries from this session', flush: false,
   body: '<section class="grp"><table class="t"><tbody>' + ACTIVITY.map(function (a) { return '<tr><td class="mono muted" style="width:84px">' + a[0] + '</td><td><b>' + a[1] + '</b></td><td class="muted">' + a[2] + '</td><td style="text-align:right">' + chip(a[3], a[3] === 'ok' ? 'Done' : a[3] === 'info' ? 'Started' : 'Skipped') + '</td></tr>'; }).join('') + '</tbody></table></section>' }; }
@@ -287,7 +288,7 @@ function vSettings() {
     : S.setPage === 'busview' ? '<section class="grp"><h3>Reading</h3>' + setrow('Explain each value', 'Show a line under each value saying what it means and whether it matters.', '<button type="button" class="sw" role="switch" data-act="explain" aria-checked="' + S.explain + '" aria-label="Explain each value"></button>')
       + setrow('Sizes', 'Show capacities the way drive makers do (GB) or the way Windows does (GiB).', sgc('units', [['gb', 'GB'], ['gib', 'GiB']], 'gb')) + '</section>'
       + '<section class="grp"><h3>Snapshots</h3>' + setrow('Snapshot folder', '<span class="mono">C:\\Users\\Sam\\Documents\\Busview\\Snapshots</span>', btn('Change', {})) + setrow('Hide serial numbers in exports', 'Replace serial numbers and MAC addresses when a report or snapshot is exported.', '<button type="button" class="sw" role="switch" aria-checked="true" aria-label="Hide serial numbers in exports"></button>') + '</section>'
-      + '<section class="grp"><h3>Compatibility database</h3>' + setrow('Version 2026.11.1', 'Board specifications, processor limits and 244 beep codes. Updated separately from Busview.', btn('Check for update', { icon: 'refresh-cw' })) + '</section>'
+      + '<section class="grp"><h3>Compatibility database</h3>' + setrow('Version 2026.11.1', 'Board specifications, processor limits and 177 beep codes. Updated separately from Busview.', btn('Check for update', { icon: 'refresh-cw' })) + '</section>'
     : '<section class="grp"><h3>Log</h3>' + setrow('Keep a log file', 'What Busview did, the same record Activity shows.', '<button type="button" class="sw" role="switch" aria-checked="true" aria-label="Keep a log file"></button>') + setrow('Log folder', '<span class="mono">%LOCALAPPDATA%\\Busview\\Logs</span>', btn('Open', {})) + '</section>';
   return { head: [], status: 'Settings are saved as you change them', flush: true, body: tabs + '<div class="content">' + body + '</div>' };
 }

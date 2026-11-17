@@ -20,7 +20,7 @@ Sections: 5 | Checklist items: 30
 
 ### Phase 1: Reading the machine
 
-Sections: 13 | Checklist items: 81
+Sections: 13 | Checklist items: 82
 
 | Status | Reference   | Deliverable                            | Needs        | Items |
 | ------ | ----------- | -------------------------------------- | ------------ | ----- |
@@ -30,67 +30,67 @@ Sections: 13 | Checklist items: 81
 | [ ]    | D00 T01 §9  | Memory Slots and Modules               | windows-host | 8     |
 | [ ]    | D00 T01 §10 | Processor Values From CPUID            | windows-host | 8     |
 | [ ]    | D00 T01 §11 | Firmware Tables, TPM and Secure Boot   | windows-host | 6     |
-| [ ]    | D00 T01 §12 | Drives and Their Connections           | windows-host | 6     |
-| [ ]    | D00 T01 §13 | Drive Health With Administrator Rights | windows-host | 6     |
+| [ ]    | D00 T01 §12 | Drives and Their Connections           | windows-host | 7     |
+| [ ]    | D00 T01 §13 | Drive Health With Administrator Rights | windows-host | 7     |
 | [ ]    | D00 T01 §14 | Graphics Adapters and Vendor Detail    | windows-host | 5     |
 | [ ]    | D00 T01 §15 | Displays From EDID                     | windows-host | 5     |
-| [ ]    | D00 T01 §16 | PCI and USB Devices                    | windows-host | 6     |
+| [ ]    | D00 T01 §16 | PCI and USB Devices                    | windows-host | 5     |
 | [ ]    | D00 T01 §17 | Network Adapters and Battery           | windows-host | 5     |
 | [ ]    | D00 T01 §18 | Slots and Connectors Model             | windows-host | 7     |
 
 ### Phase 2: Database and advice
 
-Sections: 7 | Checklist items: 44
+Sections: 7 | Checklist items: 48
 
-| Status | Reference   | Deliverable                            | Needs        | Items |
-| ------ | ----------- | -------------------------------------- | ------------ | ----- |
-| [ ]    | D00 T01 §19 | Compatibility Database Build           | windows-host | 6     |
-| [ ]    | D00 T01 §20 | Database Reader in the Tool            | windows-host | 6     |
-| [ ]    | D00 T01 §21 | Processor and Board Specification Data | windows-host | 6     |
-| [ ]    | D00 T01 §22 | Memory Advice                          | windows-host | 7     |
-| [ ]    | D00 T01 §23 | Storage Advice                         | windows-host | 6     |
-| [ ]    | D00 T01 §24 | Drive Health Advice                    | windows-host | 6     |
-| [ ]    | D00 T01 §25 | Windows 11 Readiness                   | windows-host | 7     |
+| Status | Reference   | Deliverable                                    | Needs        | Items |
+| ------ | ----------- | ---------------------------------------------- | ------------ | ----- |
+| [ ]    | D00 T01 §19 | Compatibility Database Build                   | windows-host | 6     |
+| [ ]    | D00 T01 §20 | Database Reader in the Tool                    | windows-host | 6     |
+| [ ]    | D00 T01 §21 | Processor, Board and System Specification Data | windows-host | 8     |
+| [ ]    | D00 T01 §22 | Memory Advice                                  | windows-host | 7     |
+| [ ]    | D00 T01 §23 | Storage Advice                                 | windows-host | 6     |
+| [ ]    | D00 T01 §24 | Drive Health Advice                            | windows-host | 7     |
+| [ ]    | D00 T01 §25 | Windows 11 Readiness                           | windows-host | 8     |
 
 ### Phase 3: Snapshots and beep codes
 
-Sections: 6 | Checklist items: 37
+Sections: 7 | Checklist items: 45
 
 | Status | Reference   | Deliverable                       | Needs        | Items |
 | ------ | ----------- | --------------------------------- | ------------ | ----- |
 | [ ]    | D00 T01 §26 | Snapshot File Format and Writer   | windows-host | 7     |
-| [ ]    | D00 T01 §27 | Snapshot Compare Engine           | windows-host | 6     |
+| [ ]    | D00 T01 §27 | Snapshot Compare Engine           | windows-host | 7     |
 | [ ]    | D00 T01 §28 | Beep Code Data in the Database    | windows-host | 6     |
 | [ ]    | D00 T01 §29 | Beep Code Lookup and Search       | windows-host | 6     |
 | [ ]    | D00 T01 §30 | Report Export and Privacy Masking | windows-host | 6     |
 | [ ]    | D00 T01 §31 | Headless Scan Command             | windows-host | 6     |
+| [ ]    | D00 T01 §43 | Database Update Check             | windows-host | 7     |
 
 ### Phase 4: The window
 
-Sections: 11 | Checklist items: 80
+Sections: 11 | Checklist items: 86
 
 | Status | Reference   | Deliverable                          | Needs                                        | Items |
 | ------ | ----------- | ------------------------------------ | -------------------------------------------- | ----- |
 | [ ]    | D00 T01 §32 | Window Shell, Sidebar and First Scan | windows-host, display-session, sdk-framework | 9     |
 | [ ]    | D00 T01 §33 | Overview Section                     | windows-host, display-session, sdk-framework | 7     |
-| [ ]    | D00 T01 §34 | Area Sections With Explain and Copy  | windows-host, display-session, sdk-framework | 9     |
-| [ ]    | D00 T01 §35 | Board Section Diagram and Inspector  | windows-host, display-session, sdk-framework | 8     |
+| [ ]    | D00 T01 §34 | Area Sections With Explain and Copy  | windows-host, display-session, sdk-framework | 10    |
+| [ ]    | D00 T01 §35 | Board Section Diagram and Inspector  | windows-host, display-session, sdk-framework | 9     |
 | [ ]    | D00 T01 §36 | Standard User Refusal and Restart    | windows-host, display-session, sdk-framework | 6     |
 | [ ]    | D00 T01 §37 | Snapshots Section                    | windows-host, display-session, sdk-framework | 8     |
 | [ ]    | D00 T01 §38 | Compare View                         | windows-host, display-session, sdk-framework | 6     |
-| [ ]    | D00 T01 §39 | Beep Codes Section                   | windows-host, display-session, sdk-framework | 7     |
+| [ ]    | D00 T01 §39 | Beep Codes Section                   | windows-host, display-session, sdk-framework | 9     |
 | [ ]    | D00 T01 §40 | Activity Section                     | windows-host, display-session, sdk-framework | 6     |
-| [ ]    | D00 T01 §41 | Settings and About Sections          | windows-host, display-session, sdk-framework | 7     |
-| [ ]    | D00 T01 §42 | Accessibility and Fidelity Pass      | windows-host, display-session, sdk-framework | 7     |
+| [ ]    | D00 T01 §41 | Settings and About Sections          | windows-host, display-session, sdk-framework | 8     |
+| [ ]    | D00 T01 §42 | Accessibility and Fidelity Pass      | windows-host, display-session, sdk-framework | 8     |
 
 ### Phase 5: Distribution
 
-Sections: 4 | Checklist items: 24
+Sections: 3 | Checklist items: 18
 
 | Status | Reference   | Deliverable                      | Needs                       | Items |
 | ------ | ----------- | -------------------------------- | --------------------------- | ----- |
-| [ ]    | D00 T01 §43 | Database Update Check            | windows-host                | 7     |
-| [ ]    | D00 T01 §44 | Language Pack and Strings        | windows-host, sdk-framework | 5     |
+| [ ]    | D00 T01 §44 | Language Pack and Strings        | windows-host, sdk-framework | 6     |
 | [ ]    | D00 T01 §45 | Portable Zip and Installer       | windows-host                | 7     |
 | [ ]    | D00 T01 §46 | User Guide and Release Documents | none                        | 5     |
 
@@ -105,4 +105,4 @@ Sections: 2 | Checklist items: 7
 
 Progress: 0/48 verified sections, 1 ready to run now.
 
-Checklist: 0/303 items completed (includes Commit items).
+Checklist: 0/316 items completed (includes Commit items).

@@ -151,7 +151,7 @@ Captures: `activity-*.png`, `settings-general-*.png`, `settings-busview-*.png`, 
 | SE-7 | Sizes | GB, as drive makers count, or GiB, as Windows counts | §41 |
 | SE-8 | Snapshot folder | The folder and Change | §41 |
 | SE-9 | Hide serial numbers in exports | On by default (X-6) | §41 |
-| SE-10 | Compatibility database | Its version, what it holds, and Check for update | §43 |
+| SE-10 | Compatibility database | Its version, what it holds, and Check for update, which says in one sentence what happened: updated, already up to date, no connection, or failed and why | §41 |
 | AB-1 | About | The SDK framework's About page from Busview's descriptor: icon, name, tagline, version, database version, running as, "Kernel driver: none", website, source, and where crash reports are written | §41 |
 
 Settings are saved as they are changed, and the status bar says so.
@@ -166,7 +166,7 @@ Settings are saved as they are changed, and the status bar says so.
 | S-4 | Delete confirmation | A dialog naming the snapshot by date, what is deleted (1 file, its size, its note), "This cannot be undone." in bold, and Cancel and Delete snapshot. Delete snapshot is the destructive button; Cancel has the focus | §37 |
 | S-5 | No match | An icon, the search text quoted, one sentence of help, and Clear search | §39 |
 | S-6 | Scan failed in part | A reader that fails shows one sentence in its section naming what could not be read and why, and every other section is complete. It is recorded in Activity as Failed or Refused | §34 |
-| S-7 | Database missing or damaged | Advice, explanations and beep codes need the database. Their places show one sentence naming the file and what to do; the inventory itself still works | §33 |
+| S-7 | Database missing or damaged | Advice, explanations and beep codes need the database. Their places show one sentence naming the file and what to do; the inventory itself still works | §33, §34, §39 |
 
 ## 9. Rules for every screen
 
@@ -177,7 +177,7 @@ Settings are saved as they are changed, and the status bar says so.
 | X-3 | State is never colour alone: every chip has an icon and a word | §42 |
 | X-4 | Text that is cut off ends in an ellipsis and has a tooltip with the full text | §42 |
 | X-5 | Report, snapshot and differences files are written atomically, read back, and the status bar and Activity say where the file went | §30 |
-| X-6 | With SE-9 on, serial numbers, MAC addresses, the computer name and the system UUID are replaced in every exported file | §30 |
+| X-6 | With SE-9 on, serial numbers, MAC addresses, the computer name and the system UUID are replaced in every exported file: reports, differences, and snapshots written outside the snapshot folder. Each is replaced by a placeholder that is the same for the same value on this installation and different for different values, so masked files still compare. Snapshots in the snapshot folder are the tool's own record and keep the real values | §30 |
 | X-7 | Every string comes from the language pack. No user-facing text is typed into the code | §44 |
 | X-8 | The UI thread never blocks: scanning, exporting and comparing run off it and report progress | §32 |
 | X-9 | Nothing invented: a value the machine did not report is absent, and a reading known to be unreliable (the firmware's memory maximum) says so in its explanation | §34 |

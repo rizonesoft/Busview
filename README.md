@@ -179,9 +179,9 @@ The whole of version 1 is planned as 48 sections in [`todo/00-busview/TODO-01-bu
 | 0 | The build, the gates, the crash handler, the checked reader | 5 |
 | 1 | Reading the machine: every hardware reader | 13 |
 | 2 | The database and the four pieces of advice | 7 |
-| 3 | Snapshots, comparison, beep codes, report export, the command line | 6 |
+| 3 | Snapshots, comparison, beep codes, report export, database updates, the command line | 7 |
 | 4 | The window, section by section, 1:1 with the design | 11 |
-| 5 | Database updates, language pack, the portable zip and the installer | 4 |
+| 5 | Language pack, the portable zip, the installer and the documents | 3 |
 | 99 | Code signing and name clearance, for the owner | 2 |
 
 Phases 0 to 3 need nothing but this repository and the pinned SDK. Phase 4 waits on Resolute-SDK: its tool window, buttons, dialogs, text boxes and accessibility support are planned there and not built yet, and Busview does not draw its own copies of them.

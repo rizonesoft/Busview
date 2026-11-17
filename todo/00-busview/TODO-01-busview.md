@@ -45,42 +45,42 @@ title: "TODO-01 -- Busview"
 | 7 | §7 | SMBIOS Table Access and Structure Walk | §4, §6 | [ ] |
 | 8 | §8 | Board, BIOS, System and Chassis Values | §7 | [ ] |
 | 9 | §9 | Memory Slots and Modules | §7 | [ ] |
-| 10 | §10 | Processor Values From CPUID | §6 | [ ] |
+| 10 | §10 | Processor Values From CPUID | §6, §7 | [ ] |
 | 11 | §11 | Firmware Tables, TPM and Secure Boot | §4, §6 | [ ] |
 | 12 | §12 | Drives and Their Connections | §6 | [ ] |
-| 13 | §13 | Drive Health With Administrator Rights | §12 | [ ] |
+| 13 | §13 | Drive Health With Administrator Rights | §4, §12 | [ ] |
 | 14 | §14 | Graphics Adapters and Vendor Detail | §5, §6 | [ ] |
 | 15 | §15 | Displays From EDID | §4, §6 | [ ] |
 | 16 | §16 | PCI and USB Devices | §6 | [ ] |
-| 17 | §17 | Network Adapters and Battery | §6 | [ ] |
+| 17 | §17 | Network Adapters and Battery | §6, §8 | [ ] |
 | 18 | §18 | Slots and Connectors Model | §9, §12, §14, §16 | [ ] |
 | 19 | §19 | Compatibility Database Build | §1 | [ ] |
 | 20 | §20 | Database Reader in the Tool | §19 | [ ] |
-| 21 | §21 | Processor and Board Specification Data | §19 | [ ] |
+| 21 | §21 | Processor, Board and System Specification Data | §16, §20 | [ ] |
 | 22 | §22 | Memory Advice | §9, §10, §20, §21 | [ ] |
 | 23 | §23 | Storage Advice | §18, §20 | [ ] |
 | 24 | §24 | Drive Health Advice | §13 | [ ] |
-| 25 | §25 | Windows 11 Readiness | §10, §11, §12, §20 | [ ] |
+| 25 | §25 | Windows 11 Readiness | §9, §10, §11, §12, §14, §15, §21 | [ ] |
 | 26 | §26 | Snapshot File Format and Writer | §6 | [ ] |
-| 27 | §27 | Snapshot Compare Engine | §26 | [ ] |
+| 27 | §27 | Snapshot Compare Engine | §24, §26 | [ ] |
 | 28 | §28 | Beep Code Data in the Database | §19 | [ ] |
 | 29 | §29 | Beep Code Lookup and Search | §20, §28 | [ ] |
-| 30 | §30 | Report Export and Privacy Masking | §26 | [ ] |
-| 31 | §31 | Headless Scan Command | §25, §30 | [ ] |
+| 30 | §30 | Report Export and Privacy Masking | §22, §27 | [ ] |
+| 31 | §31 | Headless Scan Command | §8, §11, §17, §18, §23, §25, §29, §30 | [ ] |
 | 32 | §32 | Window Shell, Sidebar and First Scan | §6 | [ ] |
-| 33 | §33 | Overview Section | §22, §23, §24, §25, §32 | [ ] |
-| 34 | §34 | Area Sections With Explain and Copy | §22, §23, §32 | [ ] |
-| 35 | §35 | Board Section Diagram and Inspector | §18, §32 | [ ] |
+| 33 | §33 | Overview Section | §8, §23, §25, §30, §32 | [ ] |
+| 34 | §34 | Area Sections With Explain and Copy | §23, §25, §27, §32 | [ ] |
+| 35 | §35 | Board Section Diagram and Inspector | §22, §23, §24, §32 | [ ] |
 | 36 | §36 | Standard User Refusal and Restart | §13, §34 | [ ] |
 | 37 | §37 | Snapshots Section | §26, §32 | [ ] |
-| 38 | §38 | Compare View | §27, §37 | [ ] |
+| 38 | §38 | Compare View | §30, §37 | [ ] |
 | 39 | §39 | Beep Codes Section | §29, §32 | [ ] |
 | 40 | §40 | Activity Section | §32 | [ ] |
-| 41 | §41 | Settings and About Sections | §32 | [ ] |
+| 41 | §41 | Settings and About Sections | §32, §43 | [ ] |
 | 42 | §42 | Accessibility and Fidelity Pass | §33, §35, §36, §38, §39, §40, §41 | [ ] |
 | 43 | §43 | Database Update Check | §20 | [ ] |
-| 44 | §44 | Language Pack and Strings | §41 | [ ] |
-| 45 | §45 | Portable Zip and Installer | §31, §42 | [ ] |
+| 44 | §44 | Language Pack and Strings | §42 | [ ] |
+| 45 | §45 | Portable Zip and Installer | §31, §44 | [ ] |
 | 46 | §46 | User Guide and Release Documents | §45 | [ ] |
 | 47 | §47 | Code Signing of Releases | §45 | [ ] |
 | 48 | §48 | Name Clearance Before the First Release | -- | [ ] |
@@ -123,13 +123,13 @@ One command runs every check the repository has, and every push runs it. It come
 1. Write `scripts/check-all.ps1` running the build, the tests and the plan gates in turn. Done when: it ends `check-all: <n> gate(s) ok` and exits 1 naming the first gate that fails.
 2. Write `.github/workflows/gates.yml` running it on `windows-latest`. Done when: the run for the commit is green.
 
-- [ ] Write `scripts/check-all.ps1`: `scripts/sdk.ps1 -Check`, `scripts/build.ps1 -Config Release`, `ctest --preset debug`, `python brand/build.py --check`, `python scripts/todo-graph.py validate`, `python scripts/todo-graph.py plan --check` and `node scripts/verify-agent-tiers.mjs`. Done when: each gate prints one line and the script ends `check-all: 7 gate(s) ok`.
+- [ ] Write `scripts/check-all.ps1`: `scripts/sdk.ps1 -Check`, `scripts/build.ps1 -Config Debug`, `ctest --preset debug`, `scripts/build.ps1 -Config Release`, `python brand/build.py --check`, `python scripts/todo-graph.py validate`, `python scripts/todo-graph.py plan --check` and `node scripts/verify-agent-tiers.mjs`. Done when: each gate prints one line and the script ends `check-all: 8 gate(s) ok` when run with `build/` and `Bin/` deleted first.
 - [ ] Make a failing gate stop the run with its name and its last lines. Done when: a deliberately broken test makes `scripts/check-all.ps1` exit 1 naming `tests`. Cheaper substitute: continuing after a failure, which buries the first cause.
 - [ ] Write `.github/workflows/gates.yml`: check out, `pwsh scripts/sdk.ps1`, the SDK's `scripts/bootstrap.ps1` for the toolchain with its download cached by `sdk/toolchain.json`'s hash, then `pwsh scripts/check-all.ps1`. Done when: the workflow run for the commit is green on GitHub.
 - [ ] Add `scripts/hardening-check.py` to the gates against `Bin\Release\Busview.exe`. Done when: the gate passes and fails when the executable is linked without `/DYNAMICBASE`. Cheaper substitute: trusting the link flags without reading the built file.
 - [ ] Commit: `gates: one command for every check, run on every push`
 
-**Test checkpoint:** `pwsh scripts/check-all.ps1` ends `check-all: 8 gate(s) ok`, and exits 1 naming the gate when one test is made to fail.
+**Test checkpoint:** from a tree with `build/` and `Bin/` deleted, `pwsh scripts/check-all.ps1` ends `check-all: 9 gate(s) ok`, and exits 1 naming the gate when one test is made to fail.
 
 ## 3. Crash Handler With a Local Minidump
 
@@ -346,8 +346,9 @@ Each drive, its capacity and how it is connected, without administrator rights. 
 2. Fill the Storage area. Done when: one group per drive matches the design's rows that need no rights.
 
 - [ ] Enumerate disk device interfaces with SetupAPI and open each with zero access rights in `src/read/storage/DriveReader.cpp`. Done when: the drives are listed from a standard-user process.
-- [ ] Read model, firmware revision, serial number, bus type (NVMe, SATA, USB) and removable flag from `StorageDeviceProperty`, and capacity from `IOCTL_DISK_GET_LENGTH_INFO`. Done when: the values match `Get-PhysicalDisk` on the test machine.
+- [ ] Read model, firmware revision, serial number, bus type (NVMe, SATA, USB) and removable flag from `StorageDeviceProperty`, and capacity from `IOCTL_DISK_GET_DRIVE_GEOMETRY_EX`, which a handle with no access rights may send (`IOCTL_DISK_GET_LENGTH_INFO` needs read access and is not used). Done when: the values match `Get-PhysicalDisk` in a non-elevated process on the test machine.
 - [ ] Read the negotiated link for NVMe drives (PCIe generation and width) from the device's PCI parent properties. Done when: an NVMe drive returns a value such as "PCIe 3.0 x4", or no value when Windows does not report it.
+- [ ] Mark the drive that holds Windows by mapping the system volume to its physical drive with `IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS`. Done when: exactly one drive is marked as the system drive on the test machine, and a fake with a volume spanning two drives marks both.
 - [ ] Skip virtual and removable-media devices with no medium, recording why in the outcome. Done when: a card reader with no card adds no drive and one Activity record says it was skipped.
 - [ ] Put the drive queries behind `DriveSource` in `src/read/storage/DriveSource.h` with a fake. Done when: `tests/drivereader_test.cpp` runs with three fake drives.
 - [ ] Commit: `read: drives and how they are connected`
@@ -367,14 +368,15 @@ SMART for SATA drives and the health log for NVMe drives need administrator righ
 1. Read the NVMe health log and SMART attributes in `src/read/storage/HealthReader.cpp`. Done when: an elevated run returns power-on hours and temperature for each drive.
 2. Refuse cleanly without rights. Done when: a standard-user run records a refusal naming administrator rights and reads nothing else differently.
 
-- [ ] Read the NVMe SMART/Health log (page 2) with `IOCTL_STORAGE_QUERY_PROPERTY` and `StorageDeviceProtocolSpecificProperty` in `src/read/storage/HealthReader.cpp`. Done when: percentage used, power-on hours, temperature and media errors are returned for an NVMe drive.
+- [ ] Read the NVMe SMART/Health log (page 2) with `IOCTL_STORAGE_QUERY_PROPERTY` and `StorageDeviceProtocolSpecificProperty` in `src/read/storage/HealthReader.cpp`. Done when: the critical warning bits, percentage used, power-on hours, temperature and media errors are returned for an NVMe drive.
 - [ ] Read ATA SMART attributes with `IOCTL_ATA_PASS_THROUGH` (SMART READ DATA): reallocated sectors (5), power-on hours (9), temperature (194), pending sectors (197), uncorrectable (198). Done when: the values match `smartctl -A` on the test machine's SATA drive.
 - [ ] Parse both through `ByteReader` and refuse a short buffer. Done when: a truncated log fixture returns an error and no values.
+- [ ] Tell four results apart on each drive: read, refused (no rights), unsupported (the drive or its bridge rejects the command, as many USB enclosures do) and failed, and mark an attribute the drive does not report as absent. Done when: a fake for each returns its own outcome with a reason, and a SATA fixture lacking attribute 197 returns the others with 197 absent.
 - [ ] Return `ReadOutcome::Refused` with "needs administrator rights" when the handle cannot be opened for the pass-through, checked at the action. Done when: the fake source returning access denied yields the refusal and the drive's other values stay (`design/SPEC.md` S-2). Cheaper substitute: reporting health as unknown with no reason.
 - [ ] Cover it in `tests/healthreader_test.cpp` with recorded log fixtures under `tests/fixtures/smart/`. Done when: `ctest --preset asan -L health` passes, and fails when attribute 5 is read from the wrong offset.
 - [ ] Commit: `read: drive health with administrator rights, and an honest refusal without`
 
-**Test checkpoint:** `sdk\reskit\cmake\bin\ctest.exe --preset asan -L health` passes for the NVMe and SATA fixtures, the truncated fixture and the refusal.
+**Test checkpoint:** `sdk\reskit\cmake\bin\ctest.exe --preset asan -L health` passes for the NVMe and SATA fixtures, the truncated fixture, and the refused, unsupported and failed reads.
 
 ## 14. Graphics Adapters and Vendor Detail
 
@@ -433,8 +435,7 @@ The Devices section: every PCI device with its location and IDs, and every USB d
 
 - [ ] Enumerate the `PCI` enumerator with `CM_Get_Device_ID_List` and read each device's location, description and hardware IDs in `src/read/devices/PciReader.cpp`. Done when: the list matches Device Manager's "by connection" PCI devices.
 - [ ] Mark a device with no driver or with a problem code, naming the problem in words. Done when: a fake device with problem code 28 reads "No driver installed".
-- [ ] Enumerate USB hubs and their ports with `IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX_V2` in `src/read/devices/UsbReader.cpp`, reading each device descriptor through `ByteReader`. Done when: each connected device returns its vendor and product IDs and its speed.
-- [ ] Name vendors from `data/pci-vendors.csv` and `data/usb-vendors.csv` compiled into the database, falling back to the ID. Done when: `VEN_10DE` reads NVIDIA and an unknown ID is shown as the ID.
+- [ ] Enumerate USB hubs and their ports in `src/read/devices/UsbReader.cpp`: `IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX` for each port's connection state and device descriptor (vendor and product IDs), read through `ByteReader`, and `IOCTL_USB_GET_NODE_CONNECTION_INFORMATION_EX_V2` for the speed it supports and runs at. Done when: each connected device returns its vendor and product IDs and its speed, and a fixture of each structure decodes.
 - [ ] Cover both in `tests/devices_test.cpp` with fake sources. Done when: `ctest --preset debug -L devices` passes.
 - [ ] Commit: `read: PCI and USB devices with their IDs`
 
@@ -454,7 +455,7 @@ The Network and power section: each physical network adapter with its state and 
 2. Read the battery with the battery IOCTLs in `src/read/BatteryReader.cpp`. Done when: a laptop returns design and full-charge capacity and a desktop returns "No battery".
 
 - [ ] List physical Ethernet and Wi-Fi adapters with their state, link speed and MAC address in `src/read/NetworkReader.cpp`, leaving out loopback, tunnel and virtual adapters. Done when: the list matches the physical adapters in Network Connections.
-- [ ] Read `BATTERY_INFORMATION` and `BATTERY_STATUS` through `IOCTL_BATTERY_QUERY_INFORMATION` in `src/read/BatteryReader.cpp`. Done when: a fake battery of 50,000 mWh design and 41,000 mWh full charge reads 18 percent wear.
+- [ ] Read the battery tag with `IOCTL_BATTERY_QUERY_TAG`, `BATTERY_INFORMATION` with `IOCTL_BATTERY_QUERY_INFORMATION` and `BATTERY_STATUS` with `IOCTL_BATTERY_QUERY_STATUS` in `src/read/BatteryReader.cpp`. Done when: a fake battery of 50,000 mWh design and 41,000 mWh full charge reads 18 percent wear.
 - [ ] Report a desktop as "No battery (desktop)" using the chassis type from §8. Done when: the desktop fixture returns that one row.
 - [ ] Cover both in `tests/network_battery_test.cpp` with fakes. Done when: `ctest --preset debug -L power` passes.
 - [ ] Commit: `read: network adapters and the battery`
@@ -477,7 +478,7 @@ The Board section and the storage advice need one list of every slot and connect
 - [ ] Decode SMBIOS type 9 in `src/read/smbios/SlotReader.cpp`: designation, slot type (PCIe generation and width, M.2 socket), usage and the bus address. Done when: the fixture returns `PCIEX16_1` as PCIe x16, in use.
 - [ ] Build `SlotModel` in `src/core/SlotModel.cpp` as a list of parts, each with a kind, a name, a state (fitted, free, needs attention) and its values. Done when: the fixture yields fifteen parts.
 - [ ] Match a fitted PCIe or M.2 slot to its device by the bus address type 9 reports. Done when: `PCIEX16_1` holds the graphics adapter and `M.2_1` the NVMe drive in the fixture.
-- [ ] Count SATA ports from the AHCI controller's implemented-ports value and match drives to ports by port number. Done when: a four-port fixture with one drive yields one fitted and three free.
+- [ ] Count SATA ports from SMBIOS type 8 port connectors of the SATA kind, and match drives to ports by the port number in each drive's location (`SPDRP_LOCATION_INFORMATION` and `IOCTL_SCSI_GET_ADDRESS`). The AHCI controller's own registers are not read: that needs a kernel driver. Done when: a fixture with four type 8 SATA connectors and one drive yields one fitted and three free, and a fixture with no type 8 structures yields the fitted drives and the mark "free ports not reported". Cheaper substitute: assuming four or six ports for a desktop.
 - [ ] Fall back when the firmware reports no type 9 slots: keep the memory slots and the drives and mark the model "slots not reported". Done when: the laptop fixture yields memory slots and drives only, with that mark (`design/SPEC.md` section 3). Cheaper substitute: inventing typical slots for the chassis type.
 - [ ] Cover it in `tests/slotmodel_test.cpp`. Done when: `ctest --preset debug -L slots` passes for the desktop, laptop and empty fixtures.
 - [ ] Commit: `core: one model of every slot and connector and what is in it`
@@ -528,9 +529,9 @@ The tool opens the database read-only, checks it is one it understands, and keep
 
 **Test checkpoint:** `sdk\reskit\cmake\bin\ctest.exe --preset debug -L database` passes for the good file and the four bad ones.
 
-## 21. Processor and Board Specification Data
+## 21. Processor, Board and System Specification Data
 
-Layer 2 of the database: what a processor supports and what a board supports, keyed on what Busview can read. This section builds the first data set and the rules for adding to it; it does not collect maker-tested kit lists, which the README places after version 1.
+Layer 2 of the database: what a processor supports and what a board or a whole system supports, keyed on what Busview can read, and the names of PCI and USB vendors. This section builds the first data set and the rules for adding to it; it does not collect maker-tested kit lists, which the README places after version 1.
 
 **Phase:** 2
 **Needs:** windows-host
@@ -539,10 +540,12 @@ Layer 2 of the database: what a processor supports and what a board supports, ke
 **Build order:**
 
 1. Write `data/processors.csv` keyed on vendor, family and model. Done when: the processors of the fixtures resolve to their memory limits.
-2. Write `data/boards.csv` keyed on the SMBIOS board maker and product. Done when: the desktop fixture's board resolves to its slots.
+2. Write `data/boards.csv` keyed on the SMBIOS board maker and product, and `data/systems.csv` keyed on the SMBIOS system maker and product. Done when: the desktop fixture's board resolves to its slots and the laptop fixture's system to its limits.
 
 - [ ] Define `data/processors.csv` (vendor, family, model, name pattern, memory types, maximum memory, maximum official speed, on the Windows 11 supported list, source, taken) and fill it for the Intel Core generations 6 to 14 and AMD Ryzen 1000 to 9000 desktop and mobile families from the makers' specification pages. Done when: each row's source is a URL on the maker's site and the fixtures' processors resolve.
 - [ ] Define `data/boards.csv` (maker, product, memory slots, maximum memory, maximum speed, M.2 slots with their link, SATA ports, source, taken) and fill it for the boards of the fixtures and the development machines from the makers' specification pages. Done when: the desktop fixture's board resolves to four slots, 128 GB, two M.2 and four SATA.
+- [ ] Define `data/systems.csv` with the same columns as `data/boards.csv`, keyed on the SMBIOS system maker and product, for laptops and brand-name desktops whose board is shared between models, and look a system row up before a board row. Done when: two fixtures that share a board product and differ in system product resolve to different maximum memory.
+- [ ] Add `data/pci-vendors.csv` and `data/usb-vendors.csv` and name the vendors of §16's devices from them, falling back to the ID. Done when: `VEN_10DE` reads NVIDIA in the Devices area and an unknown ID is shown as the ID.
 - [ ] Write `docs/data-sources.md`: which sources are used, that each row records its source and date, and that maker-tested kit lists and proprietary finders are not copied. Done when: the file states the rule for each source type. Cheaper substitute: rows with no stated origin.
 - [ ] Add `tools/check_data.py` refusing a duplicate key, an unknown memory type or a `taken` date in the future. Done when: it runs in `scripts/check-all.ps1` and fails on a duplicated row.
 - [ ] Cover the lookups in `tests/specdata_test.cpp` against the built database. Done when: `ctest --preset debug -L specdata` passes, and a processor absent from the table returns "not in the database", never a guess.
@@ -565,13 +568,13 @@ The answer to "can I add memory, and what do I buy": a verdict, a sentence, the 
 
 - [ ] Define `Advice` in `src/advice/Advice.h`: an id, the question, a verdict kind (good, watch, problem, information, not known), the verdict, a title, a sentence, an optional specification to buy, the steps, and the area it belongs to. Done when: every field of the design's advice rows and banners has a member.
 - [ ] Implement the layer 1 rule in `src/advice/MemoryAdvice.cpp`: with free slots, advise adding modules that match the fitted type, form factor, speed and voltage. Done when: the desktop fixture returns "Add 2 x 8 GB to reach 32 GB" with the specification `DDR4 UDIMM, 3200 MT/s, 1.35 V` and the fitted part number.
-- [ ] Bound the advice by the smaller of the firmware's maximum, the board's row and the processor's row, and name which one limited it. Done when: a fixture whose firmware reports 32 GB and whose board row says 128 GB uses 128 GB and says the firmware's figure was overridden by the board's specification.
+- [ ] Decide the machine's maximum by stated precedence: the system's row, else the board's row, else the firmware's figure marked "as the firmware reports, unverified"; then cap it by the processor's row when there is one, and name which source set the limit. Done when: a fixture whose firmware reports 32 GB and whose board row says 128 GB uses 128 GB and says the board's specification replaced the firmware's figure; a fixture with a 128 GB board row and a 64 GB processor row uses 64 GB and names the processor; and a fixture with only the firmware's figure uses it and says it is unverified.
 - [ ] Handle no free slots (advise replacing the pair, with the largest size the limits allow), soldered memory (say it cannot be upgraded), mixed modules (say so and advise matching the faster pair's specification) and an empty part number (give the specification without one). Done when: each fixture returns its case's advice.
 - [ ] Return verdict "not known" with the reason when the type or the slot count could not be read. Done when: a fixture with no type 17 structures returns it. Cheaper substitute: advising DDR4 by default.
-- [ ] Cover it in `tests/memoryadvice_test.cpp`. Done when: `ctest --preset debug -L memoryadvice` passes for the seven cases, and fails when the limit ignores the processor.
+- [ ] Cover it in `tests/memoryadvice_test.cpp`. Done when: `ctest --preset debug -L memoryadvice` passes for the nine cases, and fails when the limit ignores the processor.
 - [ ] Commit: `advice: what memory to buy, from the machine and the database`
 
-**Test checkpoint:** `sdk\reskit\cmake\bin\ctest.exe --preset debug -L memoryadvice` passes for all seven cases.
+**Test checkpoint:** `sdk\reskit\cmake\bin\ctest.exe --preset debug -L memoryadvice` passes for all nine cases.
 
 ## 23. Storage Advice
 
@@ -608,14 +611,15 @@ The answer to "is anything wearing out": each drive judged from its own health v
 1. Implement the rules in `src/advice/HealthAdvice.cpp`. Done when: each rule has a fixture that triggers it.
 2. Handle the unread case. Done when: a refused health read returns "Needs administrator" and no verdict on health.
 
-- [ ] State the rules as data in `src/advice/HealthRules.h`: reallocated, pending or uncorrectable sectors above zero is Watch; NVMe percentage used at or above 90 is Watch; NVMe critical warning bits or media errors above zero is Watch; otherwise Good. Done when: each rule cites the attribute it reads in a comment.
+- [ ] State the rules as data in `src/advice/HealthRules.h`: reallocated, pending or uncorrectable sectors above zero is Watch; NVMe percentage used at or above 90 is Watch; NVMe critical warning bits or media errors above zero is Watch; Good only when every value its bus type's rules read was returned and none triggers; "not known" when the read was unsupported, failed or returned only part of them. Done when: each rule cites the attribute it reads in a comment.
 - [ ] Implement `HealthAdvice` in `src/advice/HealthAdvice.cpp` returning one advice naming the drive, the value and what to do. Done when: the fixture with 8 reallocated sectors returns "Back up the 2 TB Seagate drive".
-- [ ] Add the earlier value when a previous snapshot holds one. Done when: with a snapshot fixture holding zero, the sentence says it had none on that snapshot's date.
+- [ ] Accept an optional earlier reading with its date as an input and add it to the sentence when given; §27 supplies it. Done when: given zero and a date, the sentence says the drive had none on that date, and given nothing the sentence stands alone.
+- [ ] Return "not known" naming what could not be read for an unsupported, failed or partial health read. Done when: a USB-enclosure fixture whose bridge rejects SMART returns "Health could not be read through this enclosure" and never Good. Cheaper substitute: treating missing attributes as zero.
 - [ ] Return verdict "Needs administrator" when §13 was refused. Done when: the refusal fixture returns it and no Watch (`design/SPEC.md` S-2). Cheaper substitute: reporting the drive as healthy when its health was never read.
 - [ ] Cover it in `tests/healthadvice_test.cpp`. Done when: `ctest --preset debug -L healthadvice` passes, and fails when the pending-sector rule is removed.
 - [ ] Commit: `advice: which drive to watch, by stated rules`
 
-**Test checkpoint:** `sdk\reskit\cmake\bin\ctest.exe --preset debug -L healthadvice` passes for each rule, the good case and the refusal.
+**Test checkpoint:** `sdk\reskit\cmake\bin\ctest.exe --preset debug -L healthadvice` passes for each rule, the good case, the refusal, and the unsupported and partial reads.
 
 ## 25. Windows 11 Readiness
 
@@ -632,17 +636,18 @@ The answer to "is it ready for Windows 11": each published requirement checked a
 
 - [ ] Check the processor against the supported-list column of `data/processors.csv`, 64-bit and at least two cores. Done when: a seventh-generation Intel fixture fails with "this processor is not on Microsoft's supported list".
 - [ ] Check TPM 2.0, UEFI mode and Secure Boot capability from §11, treating Secure Boot off but supported as met and saying it is off. Done when: the desktop fixture reads "Meets every requirement" with the Secure Boot note.
-- [ ] Check memory of at least 4 GB and a system drive of at least 64 GB. Done when: a 2 GB fixture fails naming memory.
+- [ ] Check memory of at least 4 GB, and 64 GB on the drive §12 marks as holding Windows. Done when: a 2 GB fixture fails naming memory, and a fixture with a 32 GB system drive and a 1 TB second drive fails naming the system drive.
+- [ ] Check the processor's speed of at least 1 GHz from the CPUID frequency leaf or the registry's `~MHz`, DirectX 12 with a WDDM 2.0 driver by creating a Direct3D 12 device at feature level 12_0 and reading the driver model version, and a display of at least 720p from §15. Done when: fixtures failing each one name it, and a machine with no display attached reads "not known" for the display.
 - [ ] Return "not known" for a requirement whose value was refused or unread, never a failure. Done when: the refused-TPM fixture reads "TPM could not be read" and the verdict is "not known".
 - [ ] Record the requirement list with its Microsoft source URL and the date taken in `data/windows11-requirements.csv`. Done when: the checks read their thresholds from the database.
-- [ ] Cover it in `tests/windows11_test.cpp`. Done when: `ctest --preset debug -L windows11` passes for pass, two failures and not known.
+- [ ] Cover it in `tests/windows11_test.cpp`. Done when: `ctest --preset debug -L windows11` passes for pass, a failure of each requirement and not known, and "Meets every requirement" is returned only when every row of `data/windows11-requirements.csv` was checked.
 - [ ] Commit: `advice: Windows 11 readiness, each requirement named`
 
-**Test checkpoint:** `sdk\reskit\cmake\bin\ctest.exe --preset debug -L windows11` passes for all four fixtures.
+**Test checkpoint:** `sdk\reskit\cmake\bin\ctest.exe --preset debug -L windows11` passes for every fixture, and fails when a requirement row is added to the data with no check.
 
 ## 26. Snapshot File Format and Writer
 
-A snapshot is one versioned JSON document holding the whole inventory, written atomically and read back.
+A snapshot is one versioned JSON document holding the whole inventory, written atomically and read back. A snapshot in the snapshot folder is the tool's own record on the user's computer and holds the real readings; when a snapshot is written anywhere else it is an export and is masked by §30.
 
 **Phase:** 3
 **Needs:** windows-host
@@ -677,8 +682,9 @@ Two snapshots compare to a list of changed values, each classed as needing atten
 2. Class each difference. Done when: the reallocated-sector rise is Watch and the power-on hours rise is Expected.
 
 - [ ] Implement `Compare(a, b)` in `src/snapshot/Compare.cpp` matching values by area, group and key, returning changed, added and removed values and the count unchanged. Done when: the fixtures yield six changed and 206 unchanged.
-- [ ] Match devices by a stable identity (a drive by serial number, a memory module by slot, a display by its EDID serial) so that a reordered list is not a change. Done when: two snapshots with their drives in a different order yield no differences.
+- [ ] Give every device an `identity` field in the snapshot, taken from its serial number where it has one and its slot otherwise, and match devices by it, so that a reordered list is not a change and a masked export still compares (§30 replaces identities with stable placeholders). Done when: two snapshots with their drives in a different order yield no differences.
 - [ ] Class differences by rules in `src/snapshot/CompareRules.h`: a health counter that rose is Watch, a module or drive that vanished is Watch, a counter that only grows with use is Expected, anything else is Changed. Done when: each rule has a fixture.
+- [ ] Pass each drive's earlier health readings and their snapshot's date to §24's health advice when an earlier snapshot of the same computer exists. Done when: with the fixture pair, the advice sentence says the drive had no reallocated sectors on the earlier date.
 - [ ] Refuse to compare snapshots of different computers unless asked, naming both. Done when: fixtures with different system identities return that refusal.
 - [ ] Cover it in `tests/compare_test.cpp`. Done when: `ctest --preset debug -L compare` passes, and fails when the Watch rule for a vanished module is removed.
 - [ ] Commit: `snapshot: compare two snapshots and class each change`
@@ -744,8 +750,8 @@ The report a person keeps or sends: the whole inventory and the advice as a read
 
 - [ ] Implement `Report::WriteText(inventory, advice, path)` and `WriteJson` in `src/snapshot/Report.cpp`, both through the atomic write and readback of §26. Done when: the text export lists every area, group and value and the four pieces of advice.
 - [ ] Implement `Report::WriteDifferences(compareResult, path)`. Done when: the design's six differences export with both readings and their class.
-- [ ] Mark the values that identify a person or a machine in the model (serial numbers, MAC addresses, computer name, system UUID, asset tags) and implement `Mask` in `src/snapshot/Mask.cpp` replacing each with a stable placeholder of the same kind. Done when: a test greps the masked export for every such value of the fixture and finds none (`design/SPEC.md` X-6). Cheaper substitute: masking by a pattern over the output text, which misses values that do not look like serial numbers.
-- [ ] Keep masking on by default and off only by an explicit setting or argument. Done when: an export with no option is masked.
+- [ ] Mark the values that identify a person or a machine in the model (serial numbers, MAC addresses, computer name, system UUID, asset tags) and implement `Mask` in `src/snapshot/Mask.cpp` replacing each with a placeholder of the same kind made from a hash of the value and a random salt kept in this installation's settings, so the same value always gets the same placeholder here, two different values never share one, and the value cannot be worked back. Done when: a test greps the masked export for every such value of the fixture and finds none, two drives identical but for their serial numbers get different placeholders, and two masked exports of the same machine compare with zero differences (`design/SPEC.md` X-6). Cheaper substitute: masking by a pattern over the output text, which misses values that do not look like serial numbers.
+- [ ] Keep masking on by default for every report, differences file and snapshot written outside the snapshot folder, and off only by an explicit setting or argument. Done when: an export with no option is masked, and a snapshot saved into the snapshot folder holds the real values.
 - [ ] Cover it in `tests/report_test.cpp` with golden files. Done when: `ctest --preset debug -L report` passes, and fails when a new identifying value is added to the model without its mark.
 - [ ] Commit: `report: export the inventory, the advice and a comparison, masked by default`
 
@@ -764,7 +770,7 @@ The engine's end-to-end proof before the window exists, and what a technician sc
 1. Parse arguments in `src/cli/CommandLine.cpp`. Done when: `Busview.exe --help` prints the options and exits 0 without opening a window.
 2. Run the scan and write the file. Done when: `Busview.exe --snapshot out.json` writes a snapshot of the real machine that reads back.
 
-- [ ] Implement `--snapshot <path>`, `--report <path>` (text or JSON by extension), `--compare <a> <b> <out>`, `--unmasked`, `--help` and `--version` in `src/cli/CommandLine.cpp`. Done when: an unknown option exits 2 naming it.
+- [ ] Implement `--snapshot <path>`, `--report <path>` (text or JSON by extension), `--compare <a> <b> <out>`, `--beep <text>`, `--unmasked`, `--help` and `--version` in `src/cli/CommandLine.cpp`, running every reader of §8 to §18 and every advice of §22 to §25. Done when: an unknown option exits 2 naming it, and the report of the real machine holds every area and the four pieces of advice.
 - [ ] Attach to the parent console when started from one, since the executable is a window application. Done when: output appears in the calling PowerShell window and `$LASTEXITCODE` is set.
 - [ ] Exit 0 on success, 1 when the file could not be written, 3 when the scan completed with a failed reader, each with one line saying what happened. Done when: a test asserts each code.
 - [ ] Add `tests/cli_test.cpp` running the built executable against the real machine in a job object with a 60-second limit, ending the whole job on timeout and teardown and starting it with no console window. Done when: `ctest --preset debug -L cli` passes and the snapshot it wrote holds a Memory area with at least one value.
@@ -823,7 +829,7 @@ The first screen: the computer in eight tiles and the advice as rows, with Resca
 - [ ] Build the eight tiles (OV-6) from the inventory, each opening its section. Done when: the driven test activates each tile by keyboard and reads the section it opened.
 - [ ] Build the advice list (OV-7, OV-8) from `Advice`, each row opening its section. Done when: the four rows show the fixture's verdicts with an icon and a word.
 - [ ] Wire Rescan, Export report and Take snapshot (OV-1 to OV-3). Done when: Take snapshot writes a file that reads back, the status bar names it, and Activity gains one record. Cheaper substitute: updating the list from memory without re-reading the folder.
-- [ ] Show the database-missing sentence in place of the advice list (S-7) and keep the tiles. Done when: with the database renamed, the tiles show and the sentence names the file.
+- [ ] Show the database-missing sentence in place of the advice list (S-7, Overview's part) and keep the tiles. Done when: with the database renamed, the tiles show and the sentence names the file.
 - [ ] Extend `tests/window_test.cpp` for the Overview. Done when: `ctest --preset debug -L overview` passes, and fails when a tile's value is forced wrong.
 - [ ] Commit: `ui: the Overview section`
 
@@ -852,6 +858,7 @@ The seven area sections share one view: advice banners, titled groups of name an
 - [ ] Add the Memory slots row (AR-7) from the slot model. Done when: four cards show in firmware order, two Fitted and two Free with the dashed outline.
 - [ ] Add the Explain toggle (AR-1) bound to the setting of SE-6, showing each value's explanation from the strings. Done when: turning it on shows the lines, the status bar says so, and the setting survives a restart.
 - [ ] Add Copy (AR-2) for the whole section as text. Done when: the clipboard holds every group, name and reading of the section.
+- [ ] With the database missing or damaged (S-7), show the values without banners, make Explain unavailable with a tooltip naming the file, and say so in the status bar. Done when: with the database renamed, every section still lists its values and Explain cannot be turned on.
 - [ ] Show a failed or refused reader as one sentence in its section (S-6) and nothing invented (X-9). Done when: a fixture whose graphics reader failed shows the sentence on Graphics and every other section complete.
 - [ ] Extend the driven tests in `tests/areaview_test.cpp`. Done when: `ctest --preset debug -L areas` passes for all seven sections, and fails when a group is dropped.
 - [ ] Commit: `ui: the seven area sections, with Explain and Copy`
@@ -879,6 +886,7 @@ The Board section: a schematic of the slots and connectors with the selected par
 - [ ] Draw the diagram (BD-2, BD-3, BD-5, BD-6) in `src/ui/BoardView.cpp` with theme tokens only: fitted filled in the success tokens, free with a dashed outline, needs attention in the warning tokens, the honesty line and the legend. Done when: the rendering in light and dark shows the three states, and no colour literal appears in the file. Cheaper substitute: hardcoded colours, which break in the other theme and in high contrast.
 - [ ] Implement selection (BD-4) by click and by arrow keys moving to the nearest part in that direction. Done when: the driven test walks from `DIMM_A1` to `SATA6G_4` by arrow keys.
 - [ ] Expose each part to UI Automation as a selectable item named with its slot and what is in it. Done when: a UI Automation walk lists fifteen named items and the selected one reports selected.
+- [ ] Wire Rescan (BD-1) in the content header to the scan of §32, keeping the selected part when it still exists. Done when: after a rescan the diagram is rebuilt from the new slot model and the same slot is selected.
 - [ ] Build the inspector (BD-7 to BD-11): heading, state chip, values, advice, Copy and Open section. Done when: selecting `M.2_2` shows "Empty M.2 slot", Free, its values and the storage advice, and Open Storage opens that section.
 - [ ] Show the single-row fallback and the empty state when the model says slots were not reported. Done when: the laptop fixture shows memory slots and drives in a row, and the empty fixture shows the SDK's empty state with its sentence.
 - [ ] Cover it in `tests/boardview_test.cpp`. Done when: `ctest --preset debug -L board-view` passes, and fails when a part loses its accessible name.
@@ -986,6 +994,8 @@ The beep codes: a search, a maker filter that starts on this computer's BIOS mak
 - [ ] Build the list (BC-3) and the meaning panel (BC-4, BC-5) in `src/ui/BeepView.cpp`: maker, pattern, meaning, "What to try" as numbered steps, Copy. Done when: selecting AMI "3 short" shows its meaning and steps, and Copy puts them on the clipboard.
 - [ ] Build the maker filter (BC-2) starting on `MakerMatch` of the BIOS vendor and marking it "(this computer)", or on All when there is no match. Done when: the AMI fixture starts on AMI with the mark and an unknown vendor starts on All with none.
 - [ ] Wire the search box (BC-1) to `BeepCodes::Search` as the user types, with Ctrl+F focusing it. Done when: typing `1 long 2 short` under All lists every maker's entry.
+- [ ] Show the nothing-selected panel (BC-5): what beep codes are, how to count them, and this computer's BIOS maker by name. Done when: with no row selected the panel shows that text and names the fixture's maker, and it returns when the selected row is filtered out.
+- [ ] With the database missing or damaged (S-7), show one sentence naming the file in place of the list and the panel. Done when: with the database renamed the section shows the sentence and the other sections work.
 - [ ] Show the no-match state (BC-6, S-5) with the text quoted and Clear search. Done when: `zzz` shows it and Clear search restores the list.
 - [ ] Set the status bar to the count shown of the total and the maker. Done when: it reads "15 of 177 codes shown, AMI" for the AMI filter.
 - [ ] Cover it in `tests/beepview_test.cpp`. Done when: `ctest --preset debug -L beep-view` passes, and fails when the filter ignores the detected maker.
@@ -1039,6 +1049,7 @@ The framework's Settings and About pages hosted in the window, with one page of 
 - [ ] Write `src/Descriptor.h`: the tool's name, tagline, version source, licence (GPL v3), website, source address and update address, and no behaviour. Done when: the framework builds About (AB-1) from it, with the database version, the rights level and "Kernel driver: none" as extra rows.
 - [ ] Host the framework's General and Logging pages (SE-1 to SE-5) in `src/ui/SettingsView.cpp`. Done when: changing the theme changes the window and survives a restart. Cheaper substitute: a settings writer in Busview.
 - [ ] Declare Busview's page to the framework: Explain each value (SE-6), Sizes (SE-7), Snapshot folder (SE-8) and Hide serial numbers in exports (SE-9, on by default). Done when: each is stored in the framework's file and read back after a restart.
+- [ ] Build the Compatibility database rows (SE-10) on Busview's page: the data version, what the database holds with its real counts, and Check for update calling §43's check off the UI thread. Done when: against the test server each outcome (updated to a named version, already up to date, no connection, update failed with its reason) shows as one sentence and one Activity record, and the version row changes after an update.
 - [ ] Consume each option: Explain in the area sections, Sizes in every capacity reading, the folder in the snapshot writer, masking in every export. Done when: switching Sizes to GiB changes "500 GB" to "465 GiB" in Storage and in a new report.
 - [ ] Refuse a snapshot folder that cannot be written, naming it and keeping the old one. Done when: choosing a read-only folder shows the sentence and the setting is unchanged.
 - [ ] Cover it in `tests/settings_test.cpp` with a fixture settings file. Done when: `ctest --preset debug -L settings` passes, and fails when an option is stored and not consumed.
@@ -1063,7 +1074,8 @@ The whole window against the contract: every control of `design/SPEC.md` account
 1. Write `tests/spec_coverage_test.cpp` walking the window for every ID. Done when: each ID of `design/SPEC.md` is found or reported missing by name.
 2. Capture the built window and fix what differs. Done when: `docs/fidelity.md` lists every ID as built.
 
-- [ ] Give every control an automation ID equal to its `design/SPEC.md` ID and write `tests/spec_coverage_test.cpp` parsing the IDs from `design/SPEC.md` and finding each through UI Automation. Done when: `ctest --preset debug -L spec` passes, and fails naming the ID when a control is removed.
+- [ ] Write `tests/spec_map.json` naming, for every ID in `design/SPEC.md`, how it is proven: a control (found through UI Automation by an automation ID equal to the SPEC ID), a state (a named driven test that puts the window in it) or a rule (a named test or gate, such as the masked-export test for X-6). Done when: every ID has exactly one entry and X-7 names the gate §44 adds.
+- [ ] Write `tests/spec_coverage_test.cpp` reading the IDs from `design/SPEC.md` and `tests/spec_map.json`, finding each control and checking each named test exists and ran. Done when: `ctest --preset debug -L spec` passes for every ID but X-7, fails naming the ID when a control is removed, and fails when `design/SPEC.md` gains an ID the map lacks.
 - [ ] Drive every action by keyboard alone in `tests/keyboard_test.cpp`: tab order follows visual order and focus is visible (X-1). Done when: the test completes take snapshot, compare, delete, a beep search and a part selection with no mouse input.
 - [ ] Check accessible names and announcements (X-2) and that every chip has an icon and a word (X-3). Done when: a UI Automation walk finds no unnamed control and the scan's end raises a notification event.
 - [ ] Capture the built window for every name `python design/capture.py --list` prints to `docs/captures/`, in light, dark and high contrast at 100, 125, 150 and 200 percent (X-10), with a provenance file. Done when: the captures are committed.
@@ -1071,13 +1083,13 @@ The whole window against the contract: every control of `design/SPEC.md` account
 - [ ] Check truncation and tooltips (X-4) at the minimum window size. Done when: no text is clipped without an ellipsis and a tooltip.
 - [ ] Commit: `ui: every control of the contract is built, named and keyboard-driven`
 
-**Test checkpoint:** `sdk\reskit\cmake\bin\ctest.exe --preset debug -L spec` and `-L keyboard` pass, and `docs/fidelity.md` lists every ID of `design/SPEC.md`.
+**Test checkpoint:** `sdk\reskit\cmake\bin\ctest.exe --preset debug -L spec` and `-L keyboard` pass with X-7 the only ID still waiting on §44, and `docs/fidelity.md` lists every ID of `design/SPEC.md`.
 
 ## 43. Database Update Check
 
-The database updates separately from the program. Check for update fetches a small manifest from the Busview repository's releases, downloads a newer database, verifies it and swaps it in.
+The database updates separately from the program. This is the engine: it fetches a small manifest from the Busview repository's releases, downloads a newer database, verifies it and swaps it in. The Check for update control that calls it (SE-10) is built in §41.
 
-**Phase:** 5
+**Phase:** 3
 **Needs:** windows-host
 **Surface:** no
 
@@ -1113,9 +1125,10 @@ Every user-facing string resolves from the suite's language pack. Until the fram
 - [ ] Write `tools/check_strings.py` listing string literals under `src/ui/` that are not keys, and add it to `scripts/check-all.ps1`. Done when: a label typed into `src/ui/OverviewView.cpp` fails the gate (`design/SPEC.md` X-7). Cheaper substitute: reviewing by eye.
 - [ ] Make every sentence with a number or a name a pattern with placeholders, never concatenation. Done when: "2 of 4 slots used" is one pack entry with two placeholders.
 - [ ] Prove the pack can be translated: add a pseudo-language pack in tests that brackets every string. Done when: a driven run with it shows no unbracketed text.
+- [ ] Remove the X-7 exception from `tests/spec_coverage_test.cpp`. Done when: `ctest --preset debug -L spec` passes for every ID in `design/SPEC.md` with no exception.
 - [ ] Commit: `strings: every word the user reads comes from the language pack`
 
-**Test checkpoint:** `python tools/check_strings.py` exits 0, and a driven run with the pseudo-language pack shows no unbracketed text.
+**Test checkpoint:** `python tools/check_strings.py` exits 0, a driven run with the pseudo-language pack shows no unbracketed text, and `sdk\reskit\cmake\bin\ctest.exe --preset debug -L spec` passes with no exception.
 
 ## 45. Portable Zip and Installer
 
@@ -1203,7 +1216,7 @@ The README's search on 2026-11-17 found no current product called Busview in thi
 ## Verification
 
 - On a real computer `Busview.exe` reads every area the machine has, gives its four pieces of advice, takes a snapshot, compares two, and finds a beep code, in light and dark, by keyboard alone.
-- `docs/fidelity.md` lists every ID of `design/SPEC.md` as built, and `sdk\reskit\cmake\bin\ctest.exe --preset debug -L spec` passes.
+- `docs/fidelity.md` lists every ID of `design/SPEC.md` as built, and `sdk\reskit\cmake\bin\ctest.exe --preset debug -L spec` passes with no exception.
 - A masked report of that computer holds none of its serial numbers, MAC addresses, its name or its UUID.
 - `pwsh scripts/check-all.ps1` passes, and the portable zip runs from an empty folder on a machine with nothing else installed.
 - `python scripts/todo-graph.py validate` and `python scripts/todo-graph.py plan --check` pass.
